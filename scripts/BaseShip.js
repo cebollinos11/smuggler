@@ -3,7 +3,6 @@ import { delay } from './utils/timing.js';
 import { animateShipAiming, animateShipShooting } from './utils/combat.js';
 import { RENDER_LAYERS } from './utils/rendering.js';
 import { showExplosion, showShieldsGettingHit, createFloatingText } from './utils/animations.js';
-import { SoundManager } from './soundManager.js';
 
 export class BaseShip {
     constructor(scene, sprite, x, y, config = {}) {
