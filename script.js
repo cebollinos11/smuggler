@@ -16,7 +16,7 @@ import { handleBorderPivots } from './scripts/utils/BorderPivots.js'; // Import 
 import { delay } from './scripts/utils/timing.js';
 import { EditorScene } from './scenes/EditorScene.js';
 import { BootScene } from './scenes/BootScene.js';
-import { SoundManager } from './scripts/soundManager.js';
+import { SoundManager } from './scripts/SoundManager.js';
 
 
 
