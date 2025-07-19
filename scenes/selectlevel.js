@@ -8,8 +8,8 @@ export default class SelectLevelScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.json('levelList', '../leveldata/levelList.json');
-    this.load.image('background', '../assets/background0.png'); // 👈 Make sure this path is correct
+    this.load.json('levelList', 'leveldata/levelList.json');
+    this.load.image('background', 'assets/background0.png'); // 👈 Make sure this path is correct
 
   }
 
