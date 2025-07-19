@@ -91,7 +91,7 @@ export default class SelectLevelScene extends Phaser.Scene {
   async loadLevelMetadata(files) {
     const results = await Promise.all(
       files.map(filename =>
-        fetch(`../leveldata/${filename}`)
+        fetch(`leveldata/${filename}`)
           .then(res => res.json())
           .then(data => ({ filename, data }))
           .catch(() => null)
