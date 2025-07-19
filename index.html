@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Star Smuggler</title>
+    <link rel="icon" type="image/png" href="/assets/playership.png">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/gameplayui.css">
+    <link rel="stylesheet" href="styles/missionreport.css">
+    <link rel="stylesheet" href="styles/loadlevel.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<div id="ui" style="display: none;">
+    <div class="row">
+        <input type="range" id="arcSlider" min="-90" max="90" value="0" step="11.25" />
+        <label>Direction: <span id="arcValue">0</span></label>
+    </div>
+    <div class="row">
+    <label for="uturnToggle">U-Turn</label>
+    <input type="checkbox" id="uturnToggle">
+    </div>
+    <div class="row">
+        <input type="range" id="arcDistSlider" min="1" max="5" value="2" step="1" />
+        <label>Thrust: <span id="arcDistValue">2</span></label>
+    </div>
+    <div class="row">
+    <label for="shieldToggle">Defensive Shields</label>
+    <input type="checkbox" id="shieldToggle">
+    </div>
+    <div class="row">
+    <label for="radarToggle">Radar</label>
+    <input type="checkbox" id="radarToggle">
+    </div>
+    <button id="shieldsButton" class="toggle-button toggle-off">
+    Shields OFF
+  </button>
+      <button id="doubleDButton" class="toggle-button toggle-off">
+    Double Damage OFF
+  </button>
+      <button id="accurateButton" class="toggle-button toggle-off">
+    AI targeting OFF
+  </button>
+      <button id="MultiTargetButton" class="toggle-button toggle-off">
+    MultiTarget OFF
+  </button>
+
+    <div>Next Move Overheat: <span id="predictedOverheat">0</span></div>
+    <div>Current Overheat: <span id="currentOverheat">0</span></div>
+    <div class="row">
+    <label for="coneSlider">View Cone</label>
+    <input type="range" id="coneSlider" min="0" max="100" value="0">
+    </div>
+    <div class="row">
+    <label for="overheatReport">Overheat Report:</label>
+    <textarea id="overheatReport" rows="5" readonly style="width: 100%; resize: vertical;"></textarea>
+    </div>
+<div id="statusBars" style="display: flex; flex-direction: column; gap: 8px; width: 200px;">
+  <div class="bar-container">
+    <span>Shield</span>
+    <div class="bar">
+      <div class="bar-fill" id="shieldBar"><span class="bar-label" id="shieldBarLabel"></span></div>
+    </div>
+  </div>
+  <div class="bar-container">
+    <span>Hull</span>
+    <div class="bar">
+      <div class="bar-fill" id="hullBar"><span class="bar-label" id="hullBarLabel"></span></div>
+    </div>
+  </div>
+  <div class="bar-container">
+  <span>Overheat</span>
+  <div class="bar">
+    <div class="bar-fill-combo" id="overheatBar">
+      <div class="bar-fill" id="overheatBarCurrent"></div>
+      <div class="bar-fill" id="overheatBarPredicted"></div>
+      <span class="bar-label" id="overheatBarLabel"></span>
+    </div>
+  </div>
+</div>
+</div>
+
+
+    <button id="sendMovement">Confirm</button>
+    <label for="zoomSlider">Zoom:</label>
+    <input type="range" id="zoomSlider" min="0.5" max="2" step="0.01" value="1">
+    <span id="zoomValue">1</span>
+</div>
+
+<!-- Mission Report UI -->
+<div id="mission-report" style="display: none;">
+  <div id="report-box">
+    <h2 id="report-title">Mission Complete!</h2>
+    
+    <div id="report-details">
+      <p><strong>Coins Collected:</strong> <span id="report-coins">0</span></p>
+      <p><strong>Time Remaining:</strong> <span id="report-time">0</span> seconds</p>
+      <p><strong>Enemies Destroyed:</strong> <span id="report-enemies">0</span></p>
+    </div>
+
+    <div id="report-failure" style="display: none;">
+      <p>Your ship was destroyed.</p>
+    </div>
+
+    <button id="continue-button">Continue</button>
+  </div>
+</div>
+<!-- Level editor -->
+<div id="levelMetaForm" style="display:none;position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; padding:10px; z-index:10;">
+    <label>Title: <input type="text" id="levelTitle" style="width:200px;" /></label><br>
+    <label>Author: <input type="text" id="levelAuthor" style="width:200px;" /></label><br>
+    <label>Difficulty: <input type="text" id="levelDifficulty" style="width:200px;" /></label><br>
+    <label>Description:<br><textarea id="levelDescription" rows="4" cols="30" style="width:200px;"></textarea></label>
+</div>
+
+<!-- Load level UI -->
+<div id="ui-levelselect" style="display: none;">
+    <h1>Select a Level</h1>
+    <div id="level-buttons"></div>
+  </div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

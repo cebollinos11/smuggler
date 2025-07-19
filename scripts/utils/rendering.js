@@ -1,0 +1,11 @@
+export const RENDER_LAYERS = Object.freeze({
+  UI:12,
+  ABOVE_PLAYER: 11,
+  PLAYER: 10,
+  PLAYER_VISUALS_BEHIND: 9,
+  ENEMY: 5,
+  COIN: 4,
+  SPACE_FEATURES: 3,
+  FAR:1,
+  LOWEST:0
+});

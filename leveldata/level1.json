@@ -1,0 +1,51 @@
+{
+  "title": "Shooting asteroids",
+  "createdby": "The architect",
+  "difficulty": "Easy",
+  "description": "",
+  "playerStart": {
+    "x": 0,
+    "y": 400
+  },
+  "exit": {
+    "x": 620,
+    "y": 4010
+  },
+  "asteroids": [
+    {
+      "x": 100,
+      "y": 400
+    }
+  ],
+  "coins": [],
+  "enemies": [
+    {
+      "x": 500,
+      "y": 400,
+      "enemy_type": "probe"
+    },
+    {
+      "x": 380.90723630215257,
+      "y": 376.18816984986233,
+      "enemy_type": "kamikaze"
+    }
+  ],
+  "borderpivots": [
+    {
+      "x": -100,
+      "y": 0
+    },
+    {
+      "x": 800,
+      "y": 0
+    },
+    {
+      "x": 800,
+      "y": 600
+    },
+    {
+      "x": -100,
+      "y": 600
+    }
+  ]
+}

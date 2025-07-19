@@ -1,0 +1,13 @@
+{
+  "title": "Duel with the Viper",
+  "createdby": "The architect",
+  "difficulty": "Easy",  
+  "exit": { "x": 620, "y": 410 },
+  "playerStart": { "x": 200, "y": 100 },
+  "enemies": [
+    { "x": 700, "y": 100, "enemy_type": "kamikaze" }
+  ],
+    "asteroids": [
+    {  "x": 560, "y": 100 }
+  ]
+}

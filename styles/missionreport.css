@@ -1,0 +1,38 @@
+
+
+#mission-report {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#report-box {
+  background: #222;
+  border: 2px solid #888;
+  padding: 30px 40px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+#report-box h2 {
+  margin-top: 0;
+}
+
+#report-box button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
