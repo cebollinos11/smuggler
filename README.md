@@ -21,7 +21,7 @@ https://opengameart.org/content/shmup-ships
 
 #todo
 
-
+get explosion to local (right now is an urls)
 hud for shields and hull
 destroyer is pretty shit - make it like the viper?
 make a "ready label" to show the player can play again

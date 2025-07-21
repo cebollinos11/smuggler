@@ -39,30 +39,6 @@ class SpaceScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet('explosion', 'https://saricden.github.io/src/img/post_imgs/kaboom.png', {
-            frameWidth: 64,
-            frameHeight: 64
-        });
-        this.load.image('ship', 'assets/playership.png');
-        this.load.image('asteroid256', 'assets/asteroid256.png');
-        this.load.image('coin', 'assets/astronaut.png');
-        this.load.image('mothership', 'assets/mothership2.png'); // Placeholder for arc preview
-        this.load.image('background','assets/background0.png');
-        this.load.image('escape','assets/blackhole.png');
-        this.load.image('reticle','assets/reticle.png');
-        this.load.image('shieldhit','assets/spr_shield_64.png');
-
-
-
-
-        this.load.image('enemy_probe', 'assets/enemies/enemy_probe.png');
-        this.load.image('enemy_kamikaze', 'assets/enemies/enemy_kamikaze.png');
-        this.load.image('enemy_viper', 'assets/enemies/enemy_viper.png');
-
-        // this.load.json('level_1', 'leveldata/level1.json');
-        // this.load.json('level_2', 'leveldata/level2.json');
-        // this.load.json('level_viper', 'leveldata/level_viper.json');
-        // this.load.json('level_deep', 'leveldata/level_deep.json');
 
 
 
@@ -175,7 +151,7 @@ class SpaceScene extends Phaser.Scene {
 
         this.anims.create({
             key: 'explode',
-            frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 7 }),
+            frames: this.anims.generateFrameNumbers('explosion', { start: 0, end: 15 }),
             frameRate: 20,
             hideOnComplete: true
         });
@@ -374,7 +350,10 @@ class SpaceScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-X', () => {
-            showShieldsGettingHit(this,this.ship.sprite.x,this.ship.sprite.y);
+            const explosion = this.add.sprite(this.ship.sprite.x, this.ship.sprite.y, 'explosion').setBlendMode(Phaser.BlendModes.ADD);
+            explosion.setDepth(RENDER_LAYERS.ABOVE_PLAYER);
+            explosion.setScale(2.0);
+            explosion.play('explode');
         });
         
         // Improved camera dragging

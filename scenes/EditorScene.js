@@ -51,14 +51,14 @@ init(data) {
 
 
     preload() {
-        this.load.image('ship', 'assets/playership.png');
-        this.load.image('asteroid256', 'assets/asteroid256.png');
-        this.load.image('coin', 'assets/astronaut.png');
-        this.load.image('escape', 'assets/blackhole.png');
-        this.load.image('enemy_probe', 'assets/enemies/enemy_probe.png');
-        this.load.image('enemy_kamikaze', 'assets/enemies/enemy_kamikaze.png');
-        this.load.image('enemy_viper', 'assets/enemies/enemy_viper.png');
-        this.load.image('pivot', 'assets/reticle.png');
+        // this.load.image('ship', 'assets/playership.png');
+        // this.load.image('asteroid256', 'assets/asteroid256.png');
+        // this.load.image('coin', 'assets/astronaut.png');
+        // this.load.image('escape', 'assets/blackhole.png');
+        // this.load.image('enemy_probe', 'assets/enemies/enemy_probe.png');
+        // this.load.image('enemy_kamikaze', 'assets/enemies/enemy_kamikaze.png');
+        // this.load.image('enemy_viper', 'assets/enemies/enemy_viper.png');
+        // this.load.image('pivot', 'assets/reticle.png');
     }
 
     create() {

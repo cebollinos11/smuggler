@@ -60,8 +60,8 @@ export function predictOverheat(angle, distance, uturnEnabled) {
     const deltaThrust = Math.abs(distance - prevThrust);
 
     // Cooling system
-    predicted -= 20;
-    report.push(`-20°C Cooling systems`);
+    predicted -= 10;
+    report.push(`-10°C Cooling systems`);
 
     // Angle change contribution
     if (deltaAngle > 120) {
@@ -87,8 +87,8 @@ export function predictOverheat(angle, distance, uturnEnabled) {
 
     // U-turn
     if (uturnEnabled) {
-        predicted += 30;
-        report.push(`+30°C U-turn`);
+        predicted += 50;
+        report.push(`+50°C U-turn`);
     }
 
     // Ship abilities

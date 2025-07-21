@@ -72,7 +72,7 @@ export async function animatePlayerExit(scene, ship, exit) {
 
 export async function showExplosion(scene,posx,posy)
 {
-    const explosion = scene.add.sprite(posx, posy, 'explosion');
+    const explosion = scene.add.sprite(posx, posy, 'explosion').setBlendMode(Phaser.BlendModes.ADD);
     explosion.setScale(2);
     explosion.setDepth(RENDER_LAYERS.ABOVE_PLAYER); // Ensure explosion is above everything else
     explosion.play('explode');
