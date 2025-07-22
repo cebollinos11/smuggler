@@ -1,6 +1,7 @@
 // ui/controller.js
 import {
-    updateOverheatUI,
+        updateOverheatUI,
+
     resetUI,
     initUI,
     setUIEnabled,
@@ -128,16 +129,7 @@ export const viewController = {
         updateOverheatPreview();
     },
 
-    onConeSliderInput: (value) => {
-        const t = value / 100;
-        const easedT = Math.sqrt(t);
 
-        sceneRef.shootAngle = sceneRef.maxAngle - (sceneRef.maxAngle - sceneRef.minAngle) * easedT;
-        sceneRef.shootRange = sceneRef.minRange + (sceneRef.maxRange - sceneRef.minRange) * t;
-
-        const ship = sceneRef.ship.sprite;
-        sceneRef.drawConePreview(ship.x, ship.y, ship.angle, sceneRef.shootRange, sceneRef.shootAngle);
-    },
 
     onShieldToggle: (enabled) => {
         sceneRef.ship.shieldsEnabled = enabled;

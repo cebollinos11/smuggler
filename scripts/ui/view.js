@@ -59,10 +59,7 @@ export function initUI(viewController, scene) {
         controller.onArcInput(angle, distance);
     });
 
-    document.getElementById('coneSlider').addEventListener('input', () => {
-        const value = parseFloat(document.getElementById('coneSlider').value);
-        controller.onConeSliderInput(value);
-    });
+
 
     document.getElementById('zoomSlider').addEventListener('input', (e) => {
         const zoom = parseFloat(e.target.value);
@@ -137,6 +134,13 @@ export function initUI(viewController, scene) {
                 updated = true;
                 break;
             case 'enter':
+                const btn = document.getElementById('sendMovement');
+                if(btn.disabled)
+                {
+                    sceneRef.game.soundManager.playSFX("miss");
+                    break;
+                }
+
                 controller.addArc(angle, distance);
                 sceneRef.game.soundManager.playSFX("keypress");
                 break;
@@ -215,7 +219,6 @@ export function updateOverheatBarUI(current, max, predictedDelta = 0) {
 
 export function updateOverheatUI(prediction, current, max, report = []) {
     const btn = document.getElementById('sendMovement');
-    document.getElementById('predictedOverheat').innerText = prediction;
 
     const sign = prediction >= 0 ? `+${prediction}` : `${prediction}`;
     btn.textContent = `Confirm (${sign}°C)`;

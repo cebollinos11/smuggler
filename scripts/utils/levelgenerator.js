@@ -7,7 +7,7 @@ export function generateLevel({
   enemyCount = 3,
   minEnemyDistance = 150,
   minCoinDistance = 50,
-  borderSegmentsPerSide = 1 // Set to >1 for more points on each side
+  borderSegmentsPerSide = 1
 } = {}) {
   const level = {
     title: "Trouble in the Asteroid Belt",
@@ -21,7 +21,6 @@ export function generateLevel({
     borderpivots: []
   };
 
-  // Generate border pivots
   level.borderpivots = generateBorderPivots(width, height, borderSegmentsPerSide);
 
   function distance(a, b) {
@@ -30,6 +29,10 @@ export function generateLevel({
 
   function isOverlapping(pos, list, minDist) {
     return list.some(item => distance(pos, item) < minDist);
+  }
+
+  function isTooCloseToStartOrExit(pos, minDist = 200) {
+    return distance(pos, level.playerStart) < minDist || distance(pos, level.exit) < minDist;
   }
 
   function isInsideBorders(pos) {
@@ -45,8 +48,7 @@ export function generateLevel({
   while (level.asteroids.length < asteroidCount) {
     const pos = { x: getRandomInt(borderSize, width - borderSize), y: getRandomInt(borderSize, height - borderSize) };
     if (
-      distance(pos, level.playerStart) > 50 &&
-      distance(pos, level.exit) > 50 &&
+      !isTooCloseToStartOrExit(pos) &&
       !isOverlapping(pos, level.asteroids, 40)
     ) {
       level.asteroids.push(pos);
@@ -57,9 +59,9 @@ export function generateLevel({
   while (level.coins.length < coinCount) {
     const pos = { x: getRandomInt(borderSize, width - borderSize), y: getRandomInt(borderSize, height - borderSize) };
     if (
+      !isTooCloseToStartOrExit(pos) &&
       !isOverlapping(pos, level.asteroids, 40) &&
-      !isOverlapping(pos, level.coins, minCoinDistance) &&
-      distance(pos, level.playerStart) > 50
+      !isOverlapping(pos, level.coins, minCoinDistance)
     ) {
       level.coins.push(pos);
     }
@@ -70,6 +72,7 @@ export function generateLevel({
   while (level.enemies.length < enemyCount) {
     const pos = { x: getRandomInt(borderSize, width - borderSize), y: getRandomInt(borderSize, height - borderSize) };
     if (
+      !isTooCloseToStartOrExit(pos) &&
       distance(pos, level.playerStart) > minEnemyDistance &&
       !isOverlapping(pos, level.asteroids, 30)
     ) {
@@ -83,6 +86,7 @@ export function generateLevel({
 
   return level;
 }
+
 
 // Border mesh generator (supports more than 4 points)
 function generateBorderPivots(width, height, segmentsPerSide = 1) {

@@ -31,11 +31,10 @@ export class ViperEnemy extends BaseEnemy {
         await this.performMovement(movementData); // wait until movement is fully done
     }
 
-    calculateMovement(playerX, playerY, playerAngle) {
-        const behindDistance = 0;
-        const angleRad = Phaser.Math.DegToRad(playerAngle);
-        const targetX = playerX - Math.cos(angleRad) * behindDistance;
-        const targetY = playerY - Math.sin(angleRad) * behindDistance;
+    calculateMovement() {
+        
+        const targetX = this.latestPrediction.x;;
+        const targetY = this.latestPrediction.y;
 
         const dx = targetX - this.sprite.x;
         const dy = targetY - this.sprite.y;

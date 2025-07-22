@@ -11,6 +11,7 @@ export class ProbeEnemy extends BaseEnemy {
     }
 
     async updateBehavior() {
+        
         const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
         const distance = 50;
         const targetX = this.sprite.x + Math.cos(angle) * distance;

@@ -1,6 +1,5 @@
 import { generateLevel } from '../scripts/utils/levelgenerator.js'; // Import the level generator
-import { SoundManager } from '../scripts/SoundManager.js';
-
+import {proceduralLevels} from "../config/LevelGenerationConfig.js"
 
 export default class SelectLevelScene extends Phaser.Scene {
   constructor() {
@@ -29,26 +28,21 @@ export default class SelectLevelScene extends Phaser.Scene {
     ui.style.display = 'block';
     buttonContainer.innerHTML = '';
 
-    // "Generate Random Level" button
-    this.createHtmlButton({
-      title: 'Generate Random Level',
-      createdby: 'Game Engine',
-      difficulty: '???',
-      onClick: () => {
-  const randomLevel = generateLevel({
-    width: 3000,
-    height: 3000,
-    asteroidCount: 60,
-    coinCount: 3,
-    enemyCount: 5,
-    minEnemyDistance: 150,
-    minCoinDistance: 50
+// Generate buttons for each predefined procedural level
+proceduralLevels.forEach(level => {
+  this.createHtmlButton({
+    title: level.title,
+    createdby: level.createdby,
+    difficulty: level.difficulty,
+    onClick: () => {
+      const levelData = generateLevel(level.config);
+      ui.style.display = 'none';
+      this.scene.start('SpaceScene', { levelData });
+    }
   });
+});
 
-  ui.style.display = 'none';
-  this.scene.start('SpaceScene', { levelData: randomLevel });
-}
-    });
+
 
     const levelFiles = this.cache.json.get('levelList');
 

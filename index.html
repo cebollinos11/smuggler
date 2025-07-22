@@ -5,30 +5,30 @@
     <title>Star Smuggler 1.0</title>
     <link rel="icon" type="image/png" href="assets/playership.png">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="styles/gameplayui.css">
     <link rel="stylesheet" href="styles/missionreport.css">
     <link rel="stylesheet" href="styles/loadlevel.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 </head>
 <body>
 
 <div id="ui" style="display: none;">
+  <div class="ui-container">
+    <div class="ui-left">
     <div class="row">
+      <label>Direction: <span id="arcValue">0</span></label>
         <input type="range" id="arcSlider" min="-90" max="90" value="0" step="11.25" />
-        <label>Direction: <span id="arcValue">0</span></label>
     </div>
     <div class="row">
     <label for="uturnToggle">U-Turn</label>
     <input type="checkbox" id="uturnToggle">
     </div>
     <div class="row">
+      <label>Thrust: <span id="arcDistValue">2</span></label>
         <input type="range" id="arcDistSlider" min="1" max="5" value="2" step="1" />
-        <label>Thrust: <span id="arcDistValue">2</span></label>
-    </div>
-    <div class="row">
-    <label for="shieldToggle">Defensive Shields</label>
-    <input type="checkbox" id="shieldToggle">
     </div>
     <div class="row">
     <label for="radarToggle">Radar</label>
@@ -47,17 +47,14 @@
     MultiTarget OFF
   </button>
 
-    <div>Next Move Overheat: <span id="predictedOverheat">0</span></div>
-    <div>Current Overheat: <span id="currentOverheat">0</span></div>
-    <div class="row">
-    <label for="coneSlider">View Cone</label>
-    <input type="range" id="coneSlider" min="0" max="100" value="0">
-    </div>
+</div>
+
+<div class="ui-right">
     <div class="row">
     <label for="overheatReport">Overheat Report:</label>
     <textarea id="overheatReport" rows="5" readonly style="width: 100%; resize: vertical;"></textarea>
     </div>
-<div id="statusBars" style="display: flex; flex-direction: column; gap: 8px; width: 200px;">
+<div id="statusBars" style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
   <div class="bar-container">
     <span>Shield</span>
     <div class="bar">
@@ -83,10 +80,14 @@
 </div>
 
 
+
+
     <button id="sendMovement">Confirm</button>
     <label for="zoomSlider">Zoom:</label>
     <input type="range" id="zoomSlider" min="0.5" max="2" step="0.01" value="1">
     <span id="zoomValue">1</span>
+</div>
+</div>
 </div>
 
 <!-- Mission Report UI -->

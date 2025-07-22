@@ -28,9 +28,7 @@ export function setupCameraControls(scene) {
         }
     });
 
-    scene.input.keyboard.on('keydown-R', () => {
-        scene.resetCameraToShip();
-    });
+
 }
 
 export async function resetCameraToShip(scene) {

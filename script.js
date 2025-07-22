@@ -43,9 +43,7 @@ class SpaceScene extends Phaser.Scene {
 
 
     }
-    updateOverheatUI() {
-        document.getElementById('currentOverheat').innerText = this.overheat + ' / ' + this.maxOverheat;
-    }
+  
 
     isTargetInCone(origin, target, maxDistance, coneAngleDeg) {
         const dx = target.x - origin.x;
@@ -240,9 +238,6 @@ class SpaceScene extends Phaser.Scene {
             }
         ).setOrigin(0.5, 0.5);
         const playerPos = levelData.playerStart;
-        this.motherShip = this.add.image(playerPos.x, playerPos.y, 'mothership');
-        this.motherShip.setOrigin(1, 0.65);
-        this.motherShip.setDepth(RENDER_LAYERS.FAR);
         const shipSprite = this.physics.add.image(playerPos.x, playerPos.y, 'ship');
         this.ship = new PlayerShip(this, shipSprite, playerPos.x, playerPos.y);
         this.ship.sprite.setCircle(16, 16, 16);
@@ -382,6 +377,7 @@ class SpaceScene extends Phaser.Scene {
         setReferenceZoom(zoom); // Set reference zoom for UI
         this.storeOriginalYValues();//for the floating idle animation
         this.ship.updateUI();
+        this.enemiesPredictPosition();
     }
 
 
@@ -472,33 +468,42 @@ class SpaceScene extends Phaser.Scene {
     });
 }
 
-    async processEnemyTurn() {
-        const playerX = this.ship.sprite.x;
-        const playerY = this.ship.sprite.y;
-        const playerAngle = this.ship.sprite.angle; 
-        
-        const enemies = this.enemies.getChildren();
-        const controllers = [];
+  async processEnemyMovementOnly() {
+    const playerX = this.ship.sprite.x;
+    const playerY = this.ship.sprite.y;
+    const playerAngle = this.ship.sprite.angle;
 
-        // Phase 1: Flash and collect controllers
-        for (const enemy of enemies) {
-            const controller = enemy.getData('controller');
-            if (controller) {
-                flashSprite(this, enemy, 1, 100, 0xffffff);
-                controllers.push({ controller, enemy });
-            }
+    const enemies = this.enemies.getChildren();
+    const controllers = [];
+
+    for (const enemy of enemies) {
+        const controller = enemy.getData('controller');
+        if (controller) {
+            flashSprite(this, enemy, 1, 100, 0xffffff);
+            controllers.push({ controller, enemy });
         }
-        await delay(this,1000);
+    }
 
-        // Phase 2: Run updateBehavior in parallel
-        await Promise.all(
-            controllers.map(({ controller }) =>
-                controller.updateBehavior(playerX, playerY, playerAngle)
-            )
-        );
+    await delay(this, 1000);
 
-        // Phase 3: Run takeAttackAction sequentially
-        for (const { controller } of controllers) {
+    // Just update behavior (movement)
+    await Promise.all(
+        controllers.map(({ controller }) =>
+            controller.updateBehavior(playerX, playerY, playerAngle)
+        )
+    );
+}
+
+async processEnemyAttackOnly() {
+    const playerX = this.ship.sprite.x;
+    const playerY = this.ship.sprite.y;
+    const playerAngle = this.ship.sprite.angle;
+
+    const enemies = this.enemies.getChildren();
+
+    for (const enemy of enemies) {
+        const controller = enemy.getData('controller');
+        if (controller) {
             await controller.takeAttackAction(playerX, playerY, playerAngle);
             if (this.ship.hullLifePoints < 1) {
                 console.log("Player ship destroyed by enemy!");
@@ -510,6 +515,8 @@ class SpaceScene extends Phaser.Scene {
             }
         }
     }
+}
+
 
 
 
@@ -518,7 +525,6 @@ class SpaceScene extends Phaser.Scene {
         this.hasCollidedThisTurn = new Set();
         this.overheat += predictOverheat(angle, distance).predicted;
         this.overheat = Math.max(this.overheat, 0);
-        this.updateOverheatUI();
         updateOverheatPreview();
 
         this.prevAngle = angle;
@@ -638,11 +644,14 @@ class SpaceScene extends Phaser.Scene {
             await this.ship.performUTurn();
         }
 
-        // player shoots
-        await this.ship.takeAttackAction();
-        //enemy turn
-        await this.processEnemyTurn();
-        //update ui
+        // Enemies move first
+await this.processEnemyMovementOnly();
+
+// Then player shoots
+await this.ship.takeAttackAction();
+
+// Then enemies shoot
+await this.processEnemyAttackOnly();
 
         //reset for new turn
         this.commandInProgress = false;
@@ -651,7 +660,29 @@ class SpaceScene extends Phaser.Scene {
 
         UIOnNewTurn();
         this.panLocked = false;
+        this.enemiesPredictPosition();
+
     }
+
+    enemiesPredictPosition()
+    {
+       //all enemies predict movement
+    this.enemies.getChildren().forEach(enemy => {
+    const controller = enemy.getData('controller');
+    if (controller && typeof controller.predictPlayerPosition === 'function') {
+        controller.predictPlayerPosition(
+            this, 
+            this.ship.sprite.x,
+            this.ship.sprite.y,
+            90,
+            500,
+            this.ship.sprite.angle
+        );
+    }
+    else{console.log("not a func")}
+});
+    }
+
 
     findTargetsInConeRange(origin, group, maxDistance, coneAngleDeg) {
         return group.getChildren().filter(target =>

@@ -21,11 +21,13 @@ https://opengameart.org/content/shmup-ships
 
 #todo
 
-get explosion to local (right now is an urls)
-hud for shields and hull
-destroyer is pretty shit - make it like the viper?
+Zoom button
+Asteroid piercer
+clean up ui
+Try again to move camera when combat
+desroyer is pretty shit - make it like the viper?
 make a "ready label" to show the player can play again
-make viper more intelligent
+make viper more intelligent (slow when close)
 damaged ships should get some smoke
 bug: overheating explosion -> Mission failed
 attack cone for player: maybe 2 modes?
