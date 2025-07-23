@@ -303,7 +303,6 @@ class SpaceScene extends Phaser.Scene {
                     console.warn('Unknown enemy type:', data.enemy_type);
                     return;
             }
-            enemySprite.setCircle(32);
         });
             
         this.children.moveBelow(this.trailContainer, this.ship.sprite);

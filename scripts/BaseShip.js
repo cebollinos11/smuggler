@@ -41,6 +41,9 @@ export class BaseShip {
         this.trailDots = [];
         this.lastTrailPosition = null;
 
+        //collider
+        this.sprite.setCircle(this.sprite.width/2);
+
     }
 
     startTrailing() {
