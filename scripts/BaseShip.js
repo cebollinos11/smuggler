@@ -35,7 +35,48 @@ export class BaseShip {
         this.doubleDEnabled = false;
         this.accurateEnabled = false;
         this.multiTargetEnabled = false;
+
+        //trail
+        this.trailing = false;
+        this.trailDots = [];
+        this.lastTrailPosition = null;
+
     }
+
+    startTrailing() {
+    this.trailing = true;
+    this.lastTrailPosition = new Phaser.Math.Vector2(this.sprite.x, this.sprite.y);
+    
+
+}
+
+stopTrailing() {
+    this.trailing = false;
+    this.lastTrailPosition = null;    
+}
+
+clearTrail(){
+// Optional: clear trail visuals
+    for (const dot of this.trailDots) {
+        dot.destroy();
+    }
+    this.trailDots = [];
+}
+
+updateTrail() {
+    if (!this.trailing || !this.lastTrailPosition) return;
+
+    const currentPos = new Phaser.Math.Vector2(this.sprite.x, this.sprite.y);
+    const distance = Phaser.Math.Distance.BetweenPoints(this.lastTrailPosition, currentPos);
+
+    if (distance >= 10) {
+        const dot = this.scene.add.circle(currentPos.x, currentPos.y, 2, 0xffffff).setDepth(RENDER_LAYERS.PLAYER_VISUALS_BEHIND);
+        this.trailDots.push(dot);
+        this.lastTrailPosition = currentPos.clone();
+    }
+}
+
+
 
     drawShield() {
         this.shieldGraphics.clear();

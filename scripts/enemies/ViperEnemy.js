@@ -112,18 +112,21 @@ export class ViperEnemy extends BaseEnemy {
 
     performMovement({ startAngleRad, angleStep, radius, sign, centerX, centerY, steps }) {
         return new Promise((resolve) => {
+            this.startTrailing();
             let stepIndex = 0;
             const timer = this.scene.time.addEvent({
                 repeat: steps - 1,
                 delay: 6,
                 callback: () => {
+
                     stepIndex++;
                     const angleOffset = startAngleRad + angleStep * stepIndex;
                     this.sprite.x = centerX + Math.cos(angleOffset) * radius;
                     this.sprite.y = centerY + Math.sin(angleOffset) * radius;
                     this.sprite.angle = Phaser.Math.RadToDeg(angleOffset) + (sign < 0 ? -90 : 90);
-
+                    this.updateTrail();
                     if (stepIndex >= steps - 1) {
+                        this.stopTrailing();
                         resolve(); // movement complete
                     }
                 }

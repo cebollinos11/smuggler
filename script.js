@@ -377,7 +377,7 @@ class SpaceScene extends Phaser.Scene {
         setReferenceZoom(zoom); // Set reference zoom for UI
         this.storeOriginalYValues();//for the floating idle animation
         this.ship.updateUI();
-        this.enemiesPredictPosition();
+        this.onTurnStarts();
     }
 
 
@@ -527,6 +527,12 @@ async processEnemyAttackOnly() {
         this.overheat = Math.max(this.overheat, 0);
         updateOverheatPreview();
 
+        //remove trails
+        this.enemies.getChildren().forEach(enemy => {
+    const controller = enemy.getData('controller');
+    controller.clearTrail();});
+    this.ship.clearTrail();
+
         this.prevAngle = angle;
         this.prevThrust = distance;
 
@@ -551,6 +557,7 @@ async processEnemyAttackOnly() {
         const distancePerStep = arcLength / steps;
 
         let step = 0;
+        this.ship.startTrailing();
 
         this.arcTimer = this.time.addEvent({
             delay: duration / steps,
@@ -566,6 +573,8 @@ async processEnemyAttackOnly() {
 
                 this.ship.sprite.x += dx;
                 this.ship.sprite.y += dy;
+
+                this.ship.updateTrail();
 
 //                 // Add fading trail dot
 // // Compute offsets for left and right propellers (±30px from center, perpendicular to ship angle)
@@ -595,7 +604,8 @@ async processEnemyAttackOnly() {
                 this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.shootRange, this.shootAngle);
                 if (step >= steps) {
                     this.arcTimer.remove();
-                    this.OnPlayerMovementComplete();                    
+                    this.OnPlayerMovementComplete(); 
+                    this.ship.stopTrailing();                   
                 }
             }
         });
@@ -661,7 +671,26 @@ await this.processEnemyAttackOnly();
         UIOnNewTurn();
         this.panLocked = false;
         this.enemiesPredictPosition();
+        this.onTurnStarts();
+    }
 
+    onTurnStarts()
+    {
+
+        this.enemies.getChildren().forEach(enemy => {
+            const controller = enemy.getData('controller');
+            if (controller && typeof controller.predictPlayerPosition === 'function') {
+                controller.predictPlayerPosition(
+                    this, 
+                    this.ship.sprite.x,
+                    this.ship.sprite.y,
+                    90,
+                    500,
+                    this.ship.sprite.angle
+                );
+            }
+            
+        });
     }
 
     enemiesPredictPosition()
