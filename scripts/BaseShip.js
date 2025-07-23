@@ -71,7 +71,7 @@ updateTrail() {
 
     if (distance >= 10) {
         const dot = this.scene.add.circle(currentPos.x, currentPos.y, 4, 0xffffff)
-            .setDepth(RENDER_LAYERS.PLAYER_VISUALS_BEHIND)
+            .setDepth(this.sprite.depth - 1)
             .setAlpha(1);
 
         this.trailDots.push(dot);
@@ -270,6 +270,7 @@ updateTrail() {
     }
 
     destroy() {
+        this.clearTrail();
         this.sprite.destroy();
         this.scene.enemies.remove(this.sprite, true);
     }
