@@ -521,6 +521,7 @@ async processEnemyAttackOnly() {
 
 
     async executeArcCommand(angle, distance) {
+        if(this.commandInProgress) return;
         this.radar.disableRadar();
         this.hasCollidedThisTurn = new Set();
         this.overheat += predictOverheat(angle, distance).predicted;
