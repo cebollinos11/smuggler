@@ -567,29 +567,29 @@ async processEnemyAttackOnly() {
                 this.ship.sprite.x += dx;
                 this.ship.sprite.y += dy;
 
-                // Add fading trail dot
-// Compute offsets for left and right propellers (±30px from center, perpendicular to ship angle)
-                const offsetX = Math.sin(angleRad) * 12;
-                const offsetY = -Math.cos(angleRad) * 12;
+//                 // Add fading trail dot
+// // Compute offsets for left and right propellers (±30px from center, perpendicular to ship angle)
+//                 const offsetX = Math.sin(angleRad) * 12;
+//                 const offsetY = -Math.cos(angleRad) * 12;
 
-                // Positions of left and right propellers
-                const leftX = this.ship.sprite.x - offsetX;
-                const leftY = this.ship.sprite.y - offsetY;
-                const rightX = this.ship.sprite.x + offsetX;
-                const rightY = this.ship.sprite.y + offsetY;
+//                 // Positions of left and right propellers
+//                 const leftX = this.ship.sprite.x - offsetX;
+//                 const leftY = this.ship.sprite.y - offsetY;
+//                 const rightX = this.ship.sprite.x + offsetX;
+//                 const rightY = this.ship.sprite.y + offsetY;
 
-                // Add fading trail dots at both positions
-                [ [leftX, leftY], [rightX, rightY] ].forEach(([x, y]) => {
-                    const dot = this.add.circle(x, y, 5, 0xFFFFFF, 0.8);
-                    this.trailContainer.add(dot);
-                    this.tweens.add({
-                        targets: dot,
-                        alpha: 0,
-                        radius: 1,
-                        duration: 1000*distance,
-                        onComplete: () => dot.destroy()
-                    });
-                });
+//                 // Add fading trail dots at both positions
+//                 [ [leftX, leftY], [rightX, rightY] ].forEach(([x, y]) => {
+//                     const dot = this.add.circle(x, y, 5, 0xFFFFFF, 0.8);
+//                     this.trailContainer.add(dot);
+//                     this.tweens.add({
+//                         targets: dot,
+//                         alpha: 0,
+//                         radius: 1,
+//                         duration: 1000*distance,
+//                         onComplete: () => dot.destroy()
+//                     });
+//                 });
 
                 step++;
                 this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.shootRange, this.shootAngle);
