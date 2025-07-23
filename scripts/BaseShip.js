@@ -70,11 +70,24 @@ updateTrail() {
     const distance = Phaser.Math.Distance.BetweenPoints(this.lastTrailPosition, currentPos);
 
     if (distance >= 10) {
-        const dot = this.scene.add.circle(currentPos.x, currentPos.y, 2, 0xffffff).setDepth(RENDER_LAYERS.PLAYER_VISUALS_BEHIND);
+        const dot = this.scene.add.circle(currentPos.x, currentPos.y, 4, 0xffffff)
+            .setDepth(RENDER_LAYERS.PLAYER_VISUALS_BEHIND)
+            .setAlpha(1);
+
         this.trailDots.push(dot);
         this.lastTrailPosition = currentPos.clone();
+
+        // Fade the dot from alpha 1 to 0.2 in 1 second
+        this.scene.tweens.add({
+            targets: dot,
+            alpha: 0.5,
+            scale: 0.5,
+            duration: 1000,
+            ease: 'Linear'
+        });
     }
 }
+
 
 
 
