@@ -280,10 +280,10 @@ class SpaceScene extends Phaser.Scene {
         this.physics.add.overlap(this.ship.sprite, this.coins, (ship, coin) => onShipCoinCollision(this, ship, coin), null, this);
                 // Step 3: Add collision between player and laser walls
         this.physics.add.collider(this.ship.sprite, this.laserWalls,(ship, wall) => onShipBorderCollision(this, ship, wall), null, this);
-
+        
         // Create enemy ships
         this.enemies = this.physics.add.group();
-
+        
         (levelData.enemies || []).forEach(data => {
             let enemySprite;
             switch (data.enemy_type) {
@@ -291,7 +291,7 @@ class SpaceScene extends Phaser.Scene {
                     enemySprite = this.enemies.create(data.x, data.y, 'enemy_probe');
                     new ProbeEnemy(this, enemySprite, data.x, data.y);
                     break;
-                case 'kamikaze':
+                    case 'kamikaze':
                     enemySprite = this.enemies.create(data.x, data.y, 'enemy_kamikaze');
                     new KamikazeEnemy(this, enemySprite, data.x, data.y);
                     break;
@@ -302,16 +302,17 @@ class SpaceScene extends Phaser.Scene {
                 default:
                     console.warn('Unknown enemy type:', data.enemy_type);
                     return;
-            }
+                }
         });
-            
+        
+        this.physics.add.overlap(this.enemies, this.asteroids, (enemy) => enemy.getData("controller").OnOverlappingAsteroid(enemy), null, this);
         this.children.moveBelow(this.trailContainer, this.ship.sprite);
 
         // this.input.keyboard.on('keydown-D', () => {
         //     window.DEBUGMODE = !window.DEBUGMODE;
         //     console.log('Debug mode:', window.DEBUGMODE);
         // });
-
+        
         this.input.keyboard.on('keydown-E', () => {            
             this.scene.start('EditorScene',this.levelData);
         });
@@ -379,7 +380,10 @@ class SpaceScene extends Phaser.Scene {
         this.onTurnStarts();
     }
 
-
+    OnOverlappingAsteroid(who)
+    {
+        console.log(who);
+    }
     
     triggerExplosion() {
         console.log("🔥 Engine overheated! Ship explodes.");
@@ -443,6 +447,7 @@ class SpaceScene extends Phaser.Scene {
 
             this.coins.getChildren().forEach(coin => {
                 coin.setY(coin.originalY + Math.sin(time * floatSpeed  + coin.originalY) * floatHeight);
+                coin.angle+=0.01;
             });
 
             this.enemies.getChildren().forEach(enemy => {
@@ -523,7 +528,7 @@ async processEnemyAttackOnly() {
         if(this.commandInProgress) return;
         this.radar.disableRadar();
         this.hasCollidedThisTurn = new Set();
-        this.overheat += predictOverheat(angle, distance).predicted;
+        this.overheat += predictOverheat(angle, distance,this.isUTurnEnabled).predicted;
         this.overheat = Math.max(this.overheat, 0);
         updateOverheatPreview();
 
@@ -670,7 +675,6 @@ await this.processEnemyAttackOnly();
 
         UIOnNewTurn();
         this.panLocked = false;
-        this.enemiesPredictPosition();
         this.onTurnStarts();
     }
 
@@ -679,38 +683,40 @@ await this.processEnemyAttackOnly();
 
         this.enemies.getChildren().forEach(enemy => {
             const controller = enemy.getData('controller');
-            if (controller && typeof controller.predictPlayerPosition === 'function') {
-                controller.predictPlayerPosition(
-                    this, 
-                    this.ship.sprite.x,
-                    this.ship.sprite.y,
-                    90,
-                    500,
-                    this.ship.sprite.angle
-                );
-            }
+            // if (controller && typeof controller.predictPlayerPosition === 'function') {
+            //     controller.predictPlayerPosition(
+            //         this, 
+            //         this.ship.sprite.x,
+            //         this.ship.sprite.y,
+            //         90,
+            //         500,
+            //         this.ship.sprite.angle
+            //     );
+            // }
+
+            controller.OnTurnStarts();
             
         });
     }
 
-    enemiesPredictPosition()
-    {
-       //all enemies predict movement
-    this.enemies.getChildren().forEach(enemy => {
-    const controller = enemy.getData('controller');
-    if (controller && typeof controller.predictPlayerPosition === 'function') {
-        controller.predictPlayerPosition(
-            this, 
-            this.ship.sprite.x,
-            this.ship.sprite.y,
-            90,
-            500,
-            this.ship.sprite.angle
-        );
-    }
-    else{console.log("not a func")}
-});
-    }
+//     enemiesPredictPosition()
+//     {
+//        //all enemies predict movement
+//     this.enemies.getChildren().forEach(enemy => {
+//     const controller = enemy.getData('controller');
+//     if (controller && typeof controller.predictPlayerPosition === 'function') {
+//         controller.predictPlayerPosition(
+//             this, 
+//             this.ship.sprite.x,
+//             this.ship.sprite.y,
+//             90,
+//             500,
+//             this.ship.sprite.angle
+//         );
+//     }
+//     else{console.log("not a func")}
+// });
+//     }
 
 
     findTargetsInConeRange(origin, group, maxDistance, coneAngleDeg) {

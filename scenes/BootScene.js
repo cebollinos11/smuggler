@@ -94,7 +94,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('reticle', 'assets/reticle.png');
     this.load.image('shieldhit', 'assets/spr_shield_64.png');
     this.load.image('enemy_probe', 'assets/enemies/enemy_probe.png');
-    this.load.image('enemy_kamikaze', 'assets/enemies/enemy_kamikaze.png');
+    this.load.image('enemy_kamikaze', 'assets/enemies/destroyer.png');
     this.load.image('enemy_viper', 'assets/enemies/enemy_viper.png');
     this.load.image('pivot', 'assets/reticle.png');
   }

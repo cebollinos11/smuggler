@@ -181,3 +181,26 @@ button:hover {
   width: 10%;
   bottom: 0px;
 }
+
+
+/* Adjust layout for mobile */
+@media (max-width: 768px) {
+  .ui-left {
+    
+        width: 90%;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        gap: 0;
+
+  }
+
+  .ui-right {
+        top: 0;
+        bottom: auto;
+        right: 0;
+        width: 24%;
+        height: 24%;
+        position: fixed;
+  }
+}

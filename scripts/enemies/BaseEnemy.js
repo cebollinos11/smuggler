@@ -8,7 +8,7 @@ export class BaseEnemy extends BaseShip {
         sprite.setDepth(RENDER_LAYERS.ENEMY); // Set a default depth for the enemy
 
         this.latestPrediction = null; // Add a property to store the latest prediction
-
+        this.hasCollidedWithAsteroidThisTurn = false;
         this.scene.input.keyboard.on('keydown-P', () => {
             const maxTurn = 90;     // example values
             const maxSpeed = 500;
@@ -29,6 +29,22 @@ export class BaseEnemy extends BaseShip {
             // Example: move towards prediction, log, or plan further
             console.log("Acting on latest prediction:", this.latestPrediction);
         }
+    }
+
+
+
+
+
+    OnTurnStarts(){
+        super.OnTurnStarts();
+        this.predictPlayerPosition(
+                    this.scene, 
+                    this.scene.ship.sprite.x,
+                    this.scene.ship.sprite.y,
+                    90,
+                    500,
+                    this.scene.ship.sprite.angle
+                );
     }
 
     predictPlayerPosition(scene, playerX, playerY, maxTurn, maxSpeed, currentAngleDegrees) {

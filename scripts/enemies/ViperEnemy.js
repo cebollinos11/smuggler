@@ -4,7 +4,7 @@ export class ViperEnemy extends BaseEnemy {
     constructor(scene, sprite, x, y) {
         super(scene, sprite, x, y);
         this.maxTurnAngle = 90; // degrees
-        this.damageOutput = 50; // Higher damage output for Viper
+        this.damageOutput = 25; // Higher damage output for Viper
         this.hullLifePoints = 30; // More hull points for Viper
 
         this.maxMoveDistance = 300; // pixels
@@ -17,7 +17,7 @@ export class ViperEnemy extends BaseEnemy {
         this.attackRange = 500; // Shorter range for probing
 
         scene.input.keyboard.on('keydown-V', () => {
-            this.autopilot(scene);
+            this.takeDamage(200);
         });
     }
 

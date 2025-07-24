@@ -2,7 +2,8 @@
 import { delay } from './utils/timing.js';
 import { animateShipAiming, animateShipShooting } from './utils/combat.js';
 import { RENDER_LAYERS } from './utils/rendering.js';
-import { showExplosion, showShieldsGettingHit, createFloatingText } from './utils/animations.js';
+import { showExplosion, showShieldsGettingHit, createFloatingText, animatePlayerExploding } from './utils/animations.js';
+import { flashSprite } from './utils/combat.js';
 
 export class BaseShip {
     constructor(scene, sprite, x, y, config = {}) {
@@ -51,6 +52,11 @@ export class BaseShip {
     this.lastTrailPosition = new Phaser.Math.Vector2(this.sprite.x, this.sprite.y);
     
 
+}
+
+OnTurnStarts(){
+    //reset shit
+        this.hasCollidedWithAsteroidThisTurn = false;
 }
 
 stopTrailing() {
@@ -107,6 +113,16 @@ updateTrail() {
 
     updatePosition() {
         // Override in subclasses
+    }
+
+    OnOverlappingAsteroid()
+    {
+        //todo if it hasent collided yet, make it blink
+        if(this.hasCollidedWithAsteroidThisTurn==false)
+        {
+            flashSprite(this.scene,this.sprite,1,100,"#333333");
+        }
+        this.hasCollidedWithAsteroidThisTurn = true;
     }
 
     async takeAttackAction() {
@@ -183,6 +199,17 @@ updateTrail() {
             hitChance = 1.0;
         }
 
+        if(this.hasCollidedWithAsteroidThisTurn){
+            hitChance = hitChance/4;
+            createFloatingText(this.scene, {
+            text: "Asteroid",
+            color: "#ffffff",
+            x: this.sprite.x,
+            y: this.sprite.y - 32,
+            fontSize: "20px"
+        });
+        }
+
         createFloatingText(this.scene, {
             text: Math.round(hitChance * 100) + "%",
             color: "#ffffff",
@@ -240,10 +267,10 @@ updateTrail() {
             this.scene.game.soundManager.playSFX("double_damage"); // 🔊 Double damage
         }
 
-        target.getData('controller').takeDamage(damageToinflict);
+        await target.getData('controller').takeDamage(damageToinflict);
     }
 
-    takeDamage(amount) {
+    async takeDamage(amount) {
         let shieldDamage = 0;
         let hullDamage = 0;
 
@@ -268,14 +295,16 @@ updateTrail() {
 
         if (this.hullLifePoints <= 0) {
             this.scene.game.soundManager.playSFX("ship_destroyed"); // 🔊 Destroyed
-            this.destroy();
+            await this.destroy();
         }
     }
 
-    destroy() {
+    async destroy() {
         this.clearTrail();
-        this.sprite.destroy();
+        await animatePlayerExploding(this.scene,this)
         this.scene.enemies.remove(this.sprite, true);
+        this.sprite.destroy();
+        console.log("destroy enemy");
     }
 
     showFloatingDamageText(shieldDamage, hullDamage) {

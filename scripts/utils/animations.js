@@ -104,12 +104,12 @@ export async function animatePlayerExploding(scene, ship) {
     sprite.setTint(0xff0000);
     scene.tweens.add({
         targets: sprite,
-        angle: 720,
-        duration: 1000,
-        ease: 'Cubic.easeOut',
+        angle: sprite.angle+45,
+        y:sprite.y+50,
+        duration: 800,
     });
 
-    await delay(scene, 1000); // Wait for spin
+    // await delay(scene, 1000); // Wait for spin
 
     // Step 2: Multiple explosions around the ship
     const explosionCount = 5;
@@ -119,7 +119,7 @@ export async function animatePlayerExploding(scene, ship) {
         const offsetX = Phaser.Math.Between(-30, 30);
         const offsetY = Phaser.Math.Between(-30, 30);
 
-        const explosion = scene.add.sprite(sprite.x + offsetX, sprite.y + offsetY, 'explosion');
+        const explosion = scene.add.sprite(sprite.x + offsetX, sprite.y + offsetY, 'explosion').setBlendMode(Phaser.BlendModes.ADD);
         explosion.setScale(Phaser.Math.FloatBetween(1, 1.5));
         explosion.setDepth(RENDER_LAYERS.ABOVE_PLAYER);
         explosion.play('explode');
