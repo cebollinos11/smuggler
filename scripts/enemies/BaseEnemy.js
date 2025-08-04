@@ -9,19 +9,19 @@ export class BaseEnemy extends BaseShip {
 
         this.latestPrediction = null; // Add a property to store the latest prediction
         this.hasCollidedWithAsteroidThisTurn = false;
-        this.scene.input.keyboard.on('keydown-P', () => {
-            const maxTurn = 90;     // example values
-            const maxSpeed = 500;
+        // this.scene.input.keyboard.on('keydown-P', () => {
+        //     const maxTurn = 90;     // example values
+        //     const maxSpeed = 500;
 
-            const playerX = this.scene.ship.sprite.x;
-            const playerY = this.scene.ship.sprite.y;
-            const playerAngle = this.scene.ship.sprite.angle; // In degrees
+        //     const playerX = this.scene.ship.sprite.x;
+        //     const playerY = this.scene.ship.sprite.y;
+        //     const playerAngle = this.scene.ship.sprite.angle; // In degrees
 
-            // Store the prediction
-            this.predictPlayerPosition(
-                this.scene, playerX, playerY, maxTurn, maxSpeed, playerAngle
-            );
-        });
+        //     // Store the prediction
+        //     this.predictPlayerPosition(
+        //         this.scene, playerX, playerY, maxTurn, maxSpeed, playerAngle
+        //     );
+        // });
     }
 
     async updateBehavior(playerX, playerY, playerAngle) {

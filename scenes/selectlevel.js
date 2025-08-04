@@ -72,6 +72,20 @@ proceduralLevels.forEach(level => {
           }
         });
 
+        // Inside create() in SelectLevelScene, after other buttons:
+this.createHtmlButton({
+  title: "Upgrades",
+  createdby: "devs",
+  difficulty: "-",
+  onClick: () => {
+    ui.style.display = 'none';
+    this.scene.start('UpgradeScene', {
+      previousScene: 'SelectLevelScene', // store where we came from
+    });
+  }
+});
+
+
         //play bgm
 
 

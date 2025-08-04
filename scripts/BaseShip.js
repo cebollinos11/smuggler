@@ -1,31 +1,24 @@
 // BaseShip.js
 import { delay } from './utils/timing.js';
-import { animateShipAiming, animateShipShooting } from './utils/combat.js';
+import { animateShipAiming, animateShipShooting, flashSprite } from './utils/combat.js';
 import { RENDER_LAYERS } from './utils/rendering.js';
 import { showExplosion, showShieldsGettingHit, createFloatingText, animatePlayerExploding } from './utils/animations.js';
-import { flashSprite } from './utils/combat.js';
+import { createShipStats, StatType } from './Stats.js';
 
 export class BaseShip {
-    constructor(scene, sprite, x, y, config = {}) {
+    constructor(scene, sprite, x, y, stats) {
         this.isPlayer = false;
         this.scene = scene;
         this.sprite = sprite;
         this.sprite.setData('controller', this);
-
+        this.unitDistance = 100;
+        this.moveSpeed = 100;
         this.x = x;
         this.y = y;
 
-        // Default ship stats
-        this.unitDistance = 100;
-        this.moveSpeed = config.moveSpeed || 100;
-        this.maxTurningAngle = config.maxTurningAngle || 5;
-        this.attackType = config.attackType || 'laser';
-        this.attackConeAngle = config.attackConeAngle || 30;
-        this.attackRange = config.attackRange || 300;
-        this.shieldLevel = config.shieldLevel || 0;
-        this.hullLifePoints = config.hullLifePoints || 100;
-        this.basehullLifePoints = this.hullLifePoints;
-        this.damageOutput = 10;
+        // Fully stat-driven
+        this.stats = stats;
+        //reset some stats
 
         // Shields
         this.shieldsEnabled = false;
@@ -37,68 +30,63 @@ export class BaseShip {
         this.accurateEnabled = false;
         this.multiTargetEnabled = false;
 
-        //trail
+        // Trail
         this.trailing = false;
         this.trailDots = [];
         this.lastTrailPosition = null;
 
-        //collider
-        this.sprite.setCircle(this.sprite.width/2);
+        // Collider
+        this.sprite.setCircle(this.sprite.width / 2);
+    }
 
+    resetStats(){
+        this.stats[StatType.SHIELD].current = this.stats[StatType.SHIELD].base;
     }
 
     startTrailing() {
-    this.trailing = true;
-    this.lastTrailPosition = new Phaser.Math.Vector2(this.sprite.x, this.sprite.y);
-    
+        this.trailing = true;
+        this.lastTrailPosition = new Phaser.Math.Vector2(this.sprite.x, this.sprite.y);
+    }
 
-}
-
-OnTurnStarts(){
-    //reset shit
+    OnTurnStarts() {
         this.hasCollidedWithAsteroidThisTurn = false;
-}
-
-stopTrailing() {
-    this.trailing = false;
-    this.lastTrailPosition = null;    
-}
-
-clearTrail(){
-// Optional: clear trail visuals
-    for (const dot of this.trailDots) {
-        dot.destroy();
     }
-    this.trailDots = [];
-}
 
-updateTrail() {
-    if (!this.trailing || !this.lastTrailPosition) return;
-
-    const currentPos = new Phaser.Math.Vector2(this.sprite.x, this.sprite.y);
-    const distance = Phaser.Math.Distance.BetweenPoints(this.lastTrailPosition, currentPos);
-
-    if (distance >= 10) {
-        const dot = this.scene.add.circle(currentPos.x, currentPos.y, 4, 0xffffff)
-            .setDepth(this.sprite.depth - 1)
-            .setAlpha(1);
-
-        this.trailDots.push(dot);
-        this.lastTrailPosition = currentPos.clone();
-
-        // Fade the dot from alpha 1 to 0.2 in 1 second
-        this.scene.tweens.add({
-            targets: dot,
-            alpha: 0.5,
-            scale: 0.5,
-            duration: 1000,
-            ease: 'Linear'
-        });
+    stopTrailing() {
+        this.trailing = false;
+        this.lastTrailPosition = null;
     }
-}
 
+    clearTrail() {
+        for (const dot of this.trailDots) {
+            dot.destroy();
+        }
+        this.trailDots = [];
+    }
 
+    updateTrail() {
+        if (!this.trailing || !this.lastTrailPosition) return;
 
+        const currentPos = new Phaser.Math.Vector2(this.sprite.x, this.sprite.y);
+        const distance = Phaser.Math.Distance.BetweenPoints(this.lastTrailPosition, currentPos);
+
+        if (distance >= 10) {
+            const dot = this.scene.add.circle(currentPos.x, currentPos.y, 4, 0xffffff)
+                .setDepth(this.sprite.depth - 1)
+                .setAlpha(1);
+
+            this.trailDots.push(dot);
+            this.lastTrailPosition = currentPos.clone();
+
+            this.scene.tweens.add({
+                targets: dot,
+                alpha: 0.5,
+                scale: 0.5,
+                duration: 1000,
+                ease: 'Linear'
+            });
+        }
+    }
 
     drawShield() {
         this.shieldGraphics.clear();
@@ -115,22 +103,21 @@ updateTrail() {
         // Override in subclasses
     }
 
-    OnOverlappingAsteroid()
-    {
-        //todo if it hasent collided yet, make it blink
-        if(this.hasCollidedWithAsteroidThisTurn==false)
-        {
-            flashSprite(this.scene,this.sprite,1,100,"#333333");
+    OnOverlappingAsteroid() {
+        if (!this.hasCollidedWithAsteroidThisTurn) {
+            flashSprite(this.scene, this.sprite, 1, 100, "#333333");
         }
         this.hasCollidedWithAsteroidThisTurn = true;
     }
 
     async takeAttackAction() {
+        const attackRange = this.stats[StatType.ATTACK_RANGE].current;
+        const attackAngle = this.stats[StatType.ATTACK_ANGLE].current;
+
         const enemygroup = this.isPlayer ? this.scene.enemies : { getChildren: () => [this.scene.ship.sprite] };
+        this.scene.drawConePreview(this.sprite.x, this.sprite.y, this.sprite.angle, attackRange, attackAngle);
 
-        this.scene.drawConePreview(this.sprite.x, this.sprite.y, this.sprite.angle, this.attackRange, this.attackConeAngle);
-
-        const result = this.scene.findTargetsInConeRange(this.sprite, enemygroup, this.attackRange, this.attackConeAngle);
+        const result = this.scene.findTargetsInConeRange(this.sprite, enemygroup, attackRange, attackAngle);
 
         if (result.length > 0) {
             result.sort((a, b) => {
@@ -149,65 +136,67 @@ updateTrail() {
                 await this.fireWeapon(result[0]);
             }
         }
+
+        this.scene.coneGraphics.clear();
     }
 
     async fireWeapon(target) {
+        const attackRange = this.stats[StatType.ATTACK_RANGE].current;
+        const attackPower = this.stats[StatType.ATTACK_POWER].current;
+
         const { x: sx, y: sy } = this.sprite;
         const { x: tx, y: ty } = target;
 
         const distanceToTarget = Phaser.Math.Distance.Between(sx, sy, tx, ty);
         const laserLine = new Phaser.Geom.Line(sx, sy, tx, ty);
 
-        const asteroidsInLine = this.scene.asteroids.getChildren().map(asteroid => {
-            const body = asteroid.body;
-            if (!body) return null;
+        const asteroidsInLine = this.scene.asteroids.getChildren()
+            .map(asteroid => {
+                const body = asteroid.body;
+                if (!body) return null;
 
-            const radius = body.width / 2;
-            const cx = body.x + radius;
-            const cy = body.y + radius;
-            const circle = new Phaser.Geom.Circle(cx, cy, radius);
+                const radius = body.width / 2;
+                const cx = body.x + radius;
+                const cy = body.y + radius;
+                const circle = new Phaser.Geom.Circle(cx, cy, radius);
 
-            const points = Phaser.Geom.Intersects.GetLineToCircle(laserLine, circle);
-
-            if (points && points.length > 0) {
-                return {
-                    asteroid,
-                    intersection: points[0],
-                    distance: Phaser.Math.Distance.Between(sx, sy, points[0].x, points[0].y)
-                };
-            }
-
-            return null;
-        }).filter(Boolean);
+                const points = Phaser.Geom.Intersects.GetLineToCircle(laserLine, circle);
+                if (points?.length > 0) {
+                    return {
+                        asteroid,
+                        intersection: points[0],
+                        distance: Phaser.Math.Distance.Between(sx, sy, points[0].x, points[0].y)
+                    };
+                }
+                return null;
+            })
+            .filter(Boolean);
 
         let hitChance = 0;
-        const third = this.attackRange / 3;
-
+        const third = attackRange / 3;
         if (distanceToTarget <= third) {
             hitChance = 0.95;
         } else if (distanceToTarget <= 2 * third) {
             const ratio = (distanceToTarget - third) / third;
             hitChance = 0.95 - ratio * (0.95 - 0.70);
         } else {
-            const maxDistance = this.attackRange;
+            const maxDistance = attackRange;
             const remaining = Math.min(distanceToTarget - 2 * third, maxDistance - 2 * third);
             const ratio = remaining / (maxDistance - 2 * third);
             hitChance = 0.70 - ratio * (0.70 - 0.30);
         }
 
-        if (this.accurateEnabled) {
-            hitChance = 1.0;
-        }
+        if (this.accurateEnabled) hitChance = 1.0;
 
-        if(this.hasCollidedWithAsteroidThisTurn){
-            hitChance = hitChance/4;
+        if (this.hasCollidedWithAsteroidThisTurn) {
+            hitChance /= 4;
             createFloatingText(this.scene, {
-            text: "Asteroid",
-            color: "#ffffff",
-            x: this.sprite.x,
-            y: this.sprite.y - 32,
-            fontSize: "20px"
-        });
+                text: "Asteroid",
+                color: "#ffffff",
+                x: this.sprite.x,
+                y: this.sprite.y - 32,
+                fontSize: "20px"
+            });
         }
 
         createFloatingText(this.scene, {
@@ -218,93 +207,78 @@ updateTrail() {
             fontSize: "20px"
         });
 
-        this.scene.game.soundManager.playSFX("aim"); // 🔊 Aiming
-        await animateShipAiming(this.scene, this.sprite, target);
-
-        if (asteroidsInLine.length > 0) {
-            asteroidsInLine.sort((a, b) => a.distance - b.distance);
-            const { intersection } = asteroidsInLine[0];
-
-            await animateShipShooting(this.scene, this.sprite, { x: intersection.x, y: intersection.y }, {
-                laserDuration: 300,
-                flashCount: 3,
-            });
-            this.scene.game.soundManager.playSFX("hit_asteroid"); // 🔊 Asteroid hit
-            showExplosion(this.scene, intersection.x, intersection.y);
+        if (asteroidsInLine.length === 0) {
+            this.scene.game.soundManager.playSFX("aim");
+            await animateShipAiming(this.scene, this.sprite, target);
+        } else {
             return;
         }
 
         const hitRoll = Math.random();
         const isHit = hitRoll <= hitChance;
 
-        console.log(`Distance: ${distanceToTarget.toFixed(1)}, Hit chance: ${(hitChance * 100).toFixed(1)}%, Rolled: ${(hitRoll * 100).toFixed(1)}%`);
-
-        await animateShipShooting(this.scene, this.sprite, target, {
-            flashCount: 3,
-            laserDuration: 300,
-        });
-
         if (!isHit) {
-            this.scene.game.soundManager.playSFX("miss"); // 🔊 Missed shot
+            this.scene.game.soundManager.playSFX("click");
             createFloatingText(this.scene, {
                 text: "Miss",
                 x: target.x,
-                y: target.y,
+                y: target.y - 50,
                 color: "#73ff00ff",
                 floatDistance: 0,
-                scale: 2,
+                scale: 1,
                 duration: 1200
             });
+            await animateShipShooting(this.scene, this.sprite, target, { flashCount: 3, laserDuration: 300 });
             return;
         }
 
-        this.scene.game.soundManager.playSFX("hit_ship"); // 🔊 Hit ship
+        await animateShipShooting(this.scene, this.sprite, target, { flashCount: 3, laserDuration: 300 });
+        this.scene.game.soundManager.playSFX("hit_ship");
 
-        let damageToinflict = this.damageOutput;
-
+        let damageToInflict = attackPower;
         if (this.doubleDEnabled) {
-            damageToinflict *= 2;
-            this.scene.game.soundManager.playSFX("double_damage"); // 🔊 Double damage
+            damageToInflict *= 2;
+            this.scene.game.soundManager.playSFX("double_damage");
         }
 
-        await target.getData('controller').takeDamage(damageToinflict);
+        await target.getData('controller').takeDamage(damageToInflict);
     }
 
     async takeDamage(amount) {
         let shieldDamage = 0;
         let hullDamage = 0;
 
-        if (this.shieldLevel > 0 && this.shieldsEnabled) {
-            shieldDamage = Math.min(this.shieldLevel, amount);
-            this.shieldLevel -= shieldDamage;
+        const shield = this.stats[StatType.SHIELD];
+        const hull = this.stats[StatType.HULL];
+
+        if (shield.current > 0 && this.shieldsEnabled) {
+            shieldDamage = Math.min(shield.current, amount);
+            shield.current -= shieldDamage;
             amount -= shieldDamage;
             showShieldsGettingHit(this.scene, this.sprite.x, this.sprite.y);
-            this.scene.game.soundManager.playSFX("shield_hit"); // 🔊 Shield hit
+            this.scene.game.soundManager.playSFX("shield_hit");
         }
 
         if (amount > 0) {
             hullDamage = amount;
-            this.hullLifePoints -= hullDamage;
+            hull.current -= hullDamage;
             showExplosion(this.scene, this.sprite.x, this.sprite.y);
-            this.scene.game.soundManager.playSFX("hull_hit"); // 🔊 Hull hit
+            this.scene.game.soundManager.playSFX("hull_hit");
         }
 
         this.showFloatingDamageText(shieldDamage, hullDamage);
 
-        console.log(`Ship took ${shieldDamage} shield and ${hullDamage} hull damage. Hull left: ${this.hullLifePoints}, Shield: ${this.shieldLevel}`);
-
-        if (this.hullLifePoints <= 0) {
-            this.scene.game.soundManager.playSFX("ship_destroyed"); // 🔊 Destroyed
+        if (hull.current <= 0) {
+            this.scene.game.soundManager.playSFX("ship_destroyed");
             await this.destroy();
         }
     }
 
     async destroy() {
         this.clearTrail();
-        await animatePlayerExploding(this.scene,this)
+        await animatePlayerExploding(this.scene, this);
         this.scene.enemies.remove(this.sprite, true);
         this.sprite.destroy();
-        console.log("destroy enemy");
     }
 
     showFloatingDamageText(shieldDamage, hullDamage) {
@@ -338,7 +312,7 @@ updateTrail() {
         const originalAngle = this.sprite.angle;
         const targetAngle = (originalAngle + 180) % 360;
 
-        this.scene.game.soundManager.playSFX("turn"); // 🔊 U-turn
+        this.scene.game.soundManager.playSFX("turn");
 
         await this.createTweenPromise({
             targets: this.sprite,

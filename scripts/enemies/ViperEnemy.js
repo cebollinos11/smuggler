@@ -1,24 +1,13 @@
 import { BaseEnemy } from './BaseEnemy.js';
+import { EnemyShipTemplates, StatType, createShipStats } from '../Stats.js';
 
 export class ViperEnemy extends BaseEnemy {
     constructor(scene, sprite, x, y) {
-        super(scene, sprite, x, y);
-        this.maxTurnAngle = 90; // degrees
-        this.damageOutput = 25; // Higher damage output for Viper
-        this.hullLifePoints = 30; // More hull points for Viper
-
-        this.maxMoveDistance = 300; // pixels
+        super(scene, sprite, x, y, createShipStats(EnemyShipTemplates.viper));
 
         this.graphics = scene.add.graphics();
         this.graphics.setDepth(400);
         this.graphics.lineStyle(10, 0xFFFFFF, 0.6);
-
-        this.attackConeAngle = 90; // Wider cone for probing
-        this.attackRange = 500; // Shorter range for probing
-
-        scene.input.keyboard.on('keydown-V', () => {
-            this.takeDamage(200);
-        });
     }
 
     autopilot(scene) {
@@ -28,12 +17,11 @@ export class ViperEnemy extends BaseEnemy {
 
     async updateBehavior(playerX, playerY, playerAngle) {
         const movementData = this.calculateMovement(playerX, playerY, playerAngle);
-        await this.performMovement(movementData); // wait until movement is fully done
+        await this.performMovement(movementData);
     }
 
     calculateMovement() {
-        
-        const targetX = this.latestPrediction.x;;
+        const targetX = this.latestPrediction.x;
         const targetY = this.latestPrediction.y;
 
         const dx = targetX - this.sprite.x;
@@ -42,13 +30,15 @@ export class ViperEnemy extends BaseEnemy {
 
         const currentAngle = this.sprite.angle;
         let deltaAngle = Phaser.Math.Angle.ShortestBetween(currentAngle, angleToTarget);
-        deltaAngle = Phaser.Math.Clamp(deltaAngle, -this.maxTurnAngle, this.maxTurnAngle);
-        const fullDeltaRad = Phaser.Math.DegToRad(deltaAngle);
 
+        // Use stat system instead of hardcoded fields
+        const maxTurnAngle = this.stats[StatType.MAXTURNANGLE].current;
+        deltaAngle = Phaser.Math.Clamp(deltaAngle, -maxTurnAngle, maxTurnAngle);
+
+        const fullDeltaRad = Phaser.Math.DegToRad(deltaAngle);
         const steps = 200;
         const angleStep = fullDeltaRad / steps;
 
-        // If deltaAngle is too small, treat as straight line
         if (Math.abs(fullDeltaRad) < 0.001) {
             this.graphics.clear();
             return {
@@ -65,38 +55,15 @@ export class ViperEnemy extends BaseEnemy {
         const sign = Math.sign(deltaAngle);
         const currentRad = Phaser.Math.DegToRad(currentAngle);
 
-        // Proper radius from arc length formula: s = r * theta -> r = s / theta
-        const radius = this.maxMoveDistance / Math.abs(fullDeltaRad);
+        // Use max speed for arc length calculation
+        const maxMoveDistance = this.stats[StatType.MAXSPEED]?.current;
+        const radius = maxMoveDistance / Math.abs(fullDeltaRad);
 
-        // Arc center
         const centerX = this.sprite.x - Math.sin(currentRad) * radius * sign;
         const centerY = this.sprite.y + Math.cos(currentRad) * radius * sign;
 
         const startAngleRad = Phaser.Math.Angle.Between(centerX, centerY, this.sprite.x, this.sprite.y);
         const endAngleRad = startAngleRad + fullDeltaRad;
-
-        // Draw arc from the current position and line to player position
-        // this.graphics.clear();
-        // this.graphics.lineStyle(10, 0xFFFFFF, 0.6);
-
-        // // Draw the arc
-        // this.graphics.beginPath();
-        // this.graphics.arc(
-        //     centerX,
-        //     centerY,
-        //     radius,
-        //     startAngleRad,
-        //     endAngleRad,
-        //     sign < 0
-        // );
-        // this.graphics.strokePath();
-
-        //// Draw line from Viper to player
-        // this.graphics.lineStyle(2, 0xFF0000, 0.8); // Thinner red line for clarity
-        // this.graphics.beginPath();
-        // this.graphics.moveTo(this.sprite.x, this.sprite.y);
-        // this.graphics.lineTo(targetX, targetY);
-        // this.graphics.strokePath();
 
         return {
             startAngleRad,
@@ -114,11 +81,10 @@ export class ViperEnemy extends BaseEnemy {
         return new Promise((resolve) => {
             this.startTrailing();
             let stepIndex = 0;
-            const timer = this.scene.time.addEvent({
+            this.scene.time.addEvent({
                 repeat: steps - 1,
                 delay: 6,
                 callback: () => {
-
                     stepIndex++;
                     const angleOffset = startAngleRad + angleStep * stepIndex;
                     this.sprite.x = centerX + Math.cos(angleOffset) * radius;
@@ -127,7 +93,7 @@ export class ViperEnemy extends BaseEnemy {
                     this.updateTrail();
                     if (stepIndex >= steps - 1) {
                         this.stopTrailing();
-                        resolve(); // movement complete
+                        resolve();
                     }
                 }
             });

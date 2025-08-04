@@ -3,16 +3,12 @@
 import { BaseShip } from './BaseShip.js';
 import { UISetShieldHullLevels } from './ui/controller.js';
 import { animatePlayerExploding } from './utils/animations.js';
+import { ShipStatTemplates,StatType } from './Stats.js'; 
 export class PlayerShip extends BaseShip {
-    constructor(scene, sprite, x, y, config = {}) {
-        super(scene, sprite, x, y, config);
+ constructor(scene, sprite, x, y,shipdata) {
+        super(scene, sprite, x, y, shipdata);
         this.isPlayer = true;
-        this.attackConeAngle = 90; // Wider cone for probing
-        this.attackRange = 500; // Shorter range for probing
-        this.moveSpeed = 100;
-        this.hitBorderWall = false; // Flag to track if the ship has hit a border wall
-        this.shieldLevel = 100; // Starting shield level
-        this.damageOutput = 50; // Damage output for the player ship
+        this.hitBorderWall = false; // Track wall collisions
     }
 
     onHitBorderWall() {
@@ -33,12 +29,12 @@ export class PlayerShip extends BaseShip {
     updateUI()
     {
         UISetShieldHullLevels(
-        this.shieldLevel / 100 * 100, //max shield
-        this.hullLifePoints / 100 * 100, //max hud
-        this.shieldLevel,
-        100,
-        this.hullLifePoints,
-        100
+        this.stats[StatType.SHIELD].current  / this.stats[StatType.SHIELD].base  * 100, //max shield
+        this.stats[StatType.HULL].current  / this.stats[StatType.HULL].base  * 100, //max hud
+        this.stats[StatType.SHIELD].current ,
+        this.stats[StatType.SHIELD].base ,
+        this.stats[StatType.HULL].current ,
+        this.stats[StatType.HULL].base 
         );
     }
 }

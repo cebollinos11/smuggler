@@ -1,0 +1,59 @@
+#upgrade-ui {
+    display: none;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0,0,0,0.8);
+    padding: 15px;
+    border-radius: 10px;
+    color: white;
+    max-width: 350px;
+}
+
+#upgrade-ui h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#money-display {
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 120px;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-name {
+    font-weight: bold;
+}
+
+.stat-preview {
+    color: yellow;
+    font-size: 0.9em;
+}
+
+.stat-row button {
+    padding: 5px 10px;
+    background: #28a745;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+}
+
+.stat-row button:disabled {
+    background: #555;
+    cursor: not-allowed;
+}

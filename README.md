@@ -25,7 +25,6 @@ Zoom button
 Asteroid piercer
 clean up ui
 Try again to move camera when combat
-desroyer is pretty shit - make it like the viper?
 make a "ready label" to show the player can play again
 make viper more intelligent (slow when close)
 damaged ships should get some smoke
@@ -36,4 +35,5 @@ Bug: if the enemy is inside of an asteroid, they skip their attack
 Max moves system
 Sprite pass (astronaut, enemies, asteroids)
 
+end level -> select next level + upgrade ship
 

@@ -1,5 +1,6 @@
 import { SoundManager } from '../scripts/SoundManager.js';
-
+import { GameState } from '../scripts/GameState.js';  
+import { ShipStatTemplates,createShipStats } from '../scripts/Stats.js';
 export class BootScene extends Phaser.Scene {
   preload() {
     // === Create loading bar ===
@@ -87,6 +88,8 @@ export class BootScene extends Phaser.Scene {
       frameHeight: 64
     });
     this.load.image('ship', 'assets/playership.png');
+    this.load.image('playable_ozzy', 'assets/playableships/ozzy.png');
+
     this.load.image('asteroid256', 'assets/asteroid256.png');
     this.load.image('coin', 'assets/astronaut.png');
     this.load.image('background', 'assets/background0.png');
@@ -101,6 +104,8 @@ export class BootScene extends Phaser.Scene {
 
   create() {
     this.game.soundManager = new SoundManager(this); // Initialize singleton
+    //initialize player ship
+    GameState.shipData = createShipStats(ShipStatTemplates.standard);
     this.scene.start('SelectLevelScene');
   }
 }

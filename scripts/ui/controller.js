@@ -106,7 +106,6 @@ export function predictOverheat(angle, distance, uturnEnabled) {
             report.push(`+${ability.amount}°C ${ability.label}`);
         }
     }
-    console.log(report);
     return { predicted, report };
 
        

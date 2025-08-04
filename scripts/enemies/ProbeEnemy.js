@@ -1,13 +1,10 @@
 import { BaseEnemy } from './BaseEnemy.js';
+import {EnemyShipTemplates,createShipStats} from '../Stats.js';
+
 
 export class ProbeEnemy extends BaseEnemy {
-    constructor(scene, sprite, x, y, config = {}) {
-        super(scene, sprite, x, y, config);
-        this.moveSpeed = 200; // Slower than typical enemies
-        this.attackType = 'probe'; // Specific attack type for ProbeEnemy
-        this.attackConeAngle = 360; // Wider cone for probing
-        this.attackRange = 500; // Shorter range for probing
-        this.hullLifePoints = 1; // Minimal hull points for a probe
+    constructor(scene, sprite, x, y) {
+        super(scene, sprite, x, y, createShipStats(EnemyShipTemplates.probe));
     }
 
     async updateBehavior() {

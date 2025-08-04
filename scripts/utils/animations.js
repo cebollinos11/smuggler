@@ -79,21 +79,47 @@ export async function showExplosion(scene,posx,posy)
 }
 
 export async function showShieldsGettingHit(scene, posx, posy) {
-    const sprite = scene.add.image(posx, posy, 'shieldhit').setBlendMode(Phaser.BlendModes.ADD);;
+    const sprite = scene.add.image(posx, posy, 'shieldhit').setBlendMode(Phaser.BlendModes.ADD);
     sprite.setDepth(RENDER_LAYERS.ABOVE_PLAYER);
     sprite.setAlpha(1);
-    sprite.setScale(1); // Adjust as needed
+    sprite.setScale(1.6);
 
-    scene.tweens.add({
-        targets: sprite,
-        scale: 1.2,
-        alpha: 1,
-        duration: 1000,
-        angle:360,
-        ease: 'Cubic.easeOut',
-        onComplete: () => sprite.destroy()
-    });
+    const flickerCount = 4;
+    let flickerIndex = 0;
+
+    const flicker = () => {
+        if (flickerIndex >= flickerCount) {
+            // After flickering, do final tween
+            scene.tweens.add({
+                targets: sprite,
+                scale: 2,
+                angle: 360,
+                alpha: 0,
+                duration: 400,
+                ease: 'Cubic.easeOut',
+                onComplete: () => sprite.destroy()
+            });
+            return;
+        }
+
+        // Flicker out
+        scene.tweens.add({
+            targets: sprite,
+            alpha: 0.3,
+            duration: 50,
+            yoyo: true,
+            ease: 'Linear',
+            onComplete: () => {
+                flickerIndex++;
+                flicker(); // Continue flickering
+            }
+        });
+    };
+
+    flicker(); // Start flickering
 }
+
+
 
 
 export async function animatePlayerExploding(scene, ship) {

@@ -16,6 +16,9 @@ import { handleBorderPivots } from './scripts/utils/BorderPivots.js'; // Import 
 import { delay } from './scripts/utils/timing.js';
 import { EditorScene } from './scenes/EditorScene.js';
 import { BootScene } from './scenes/BootScene.js';
+import { StatType } from './scripts/Stats.js';
+import { GameState } from './scripts/GameState.js';
+import { UpgradeScene } from './scenes/UpgradeScene.js';
 
 
 
@@ -238,8 +241,8 @@ class SpaceScene extends Phaser.Scene {
             }
         ).setOrigin(0.5, 0.5);
         const playerPos = levelData.playerStart;
-        const shipSprite = this.physics.add.image(playerPos.x, playerPos.y, 'ship');
-        this.ship = new PlayerShip(this, shipSprite, playerPos.x, playerPos.y);
+        const shipSprite = this.physics.add.image(playerPos.x, playerPos.y, GameState.shipData.image);
+        this.ship = new PlayerShip(this, shipSprite, playerPos.x, playerPos.y,GameState.shipData);
         this.ship.sprite.setCircle(16, 16, 16);
         this.ship.sprite.setDepth(RENDER_LAYERS.PLAYER);
         //offset the collider
@@ -324,11 +327,9 @@ class SpaceScene extends Phaser.Scene {
 
 
         this.input.keyboard.on('keydown-F', () => {
-            this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.shootRange, this.shootAngle);
-            const possibleTargets = this.findTargetsInConeRange(this.ship.sprite,this.enemies, this.shootRange, this.shootAngle);
-            //print possible targets number
-            console.log('Possible targets in range:', possibleTargets.length);
 
+            this.ship.resetStats();
+            GameState.shipData = this.ship.stats;
 
             animatePlayerExit(this, this.ship, this.exit).then(() => {
                 console.log("Player exited the level!");
@@ -345,10 +346,8 @@ class SpaceScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-X', () => {
-            const explosion = this.add.sprite(this.ship.sprite.x, this.ship.sprite.y, 'explosion').setBlendMode(Phaser.BlendModes.ADD);
-            explosion.setDepth(RENDER_LAYERS.ABOVE_PLAYER);
-            explosion.setScale(2.0);
-            explosion.play('explode');
+            this.ship.takeDamage(10);
+
         });
         
         // Improved camera dragging
@@ -357,16 +356,7 @@ class SpaceScene extends Phaser.Scene {
         //radar
         this.radar = new Radar(this, this.ship.sprite);
 
-        
-        //shooting cone
-        this.shootRange = 300; // max distance in pixels
-        this.shootAngle = 45;  // cone angle in degrees (22.5° to each side)
-        
-        this.minAngle = 10;
-        this.maxAngle = 100;
-        this.minRange = 200;
-        this.maxRange = 600;
-        this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.shootRange, this.shootAngle);
+        this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
 
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -416,11 +406,11 @@ class SpaceScene extends Phaser.Scene {
         const startAngle = shipAngleRad - Phaser.Math.DegToRad(halfAngle);
         const endAngle = shipAngleRad + Phaser.Math.DegToRad(halfAngle);
 
-        this.coneGraphics.fillStyle(0xff0000, 0.2); // green, transparent
+        this.coneGraphics.fillStyle(0xff0000, 0.1); // green, transparent
         this.coneGraphics.slice(shipX, shipY, range, startAngle, endAngle, false);
         this.coneGraphics.fillPath();
 
-        this.coneGraphics.lineStyle(3, 0xff0000, 0.5);
+        this.coneGraphics.lineStyle(3, 0xff0000, 0.2);
         this.coneGraphics.beginPath();
         this.coneGraphics.moveTo(shipX, shipY);
         this.coneGraphics.arc(shipX, shipY, range, startAngle, endAngle, false);
@@ -509,7 +499,7 @@ async processEnemyAttackOnly() {
         const controller = enemy.getData('controller');
         if (controller) {
             await controller.takeAttackAction(playerX, playerY, playerAngle);
-            if (this.ship.hullLifePoints < 1) {
+            if (this.ship.stats[StatType.HULL].current < 1) {
                 console.log("Player ship destroyed by enemy!");
                 await animatePlayerExploding(this, this.ship);
                 this.scene.start('ReportScene', {
@@ -606,7 +596,7 @@ async processEnemyAttackOnly() {
 //                 });
 
                 step++;
-                this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.shootRange, this.shootAngle);
+                this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
                 if (step >= steps) {
                     this.arcTimer.remove();
                     this.OnPlayerMovementComplete(); 
@@ -628,7 +618,7 @@ async processEnemyAttackOnly() {
         }
 
         //check if player has hit an asteroid and died
-        if(this.ship.hullLifePoints < 1) {
+        if(this.ship.stats[StatType.HULL].current  < 1) {
             await animatePlayerExploding(this, this.ship);
             this.scene.start('ReportScene', {
                 missionFailed: true
@@ -642,6 +632,9 @@ async processEnemyAttackOnly() {
         )) {
             console.log("Player has exited the level!");
             await animatePlayerExit(this, this.ship, this.exit);
+            //save stats
+            this.ship.resetStats();
+            GameState.shipData  = this.ship.stats;
             //Trigger level completion logic here
             this.scene.start('ReportScene', {
                 missionFailed: false,
@@ -728,7 +721,7 @@ await this.processEnemyAttackOnly();
 
 const config = {
     type: Phaser.AUTO,
-    scene: [BootScene,SelectLevelScene,SpaceScene,ReportScene,EditorScene],
+    scene: [BootScene,SelectLevelScene,SpaceScene,ReportScene,EditorScene,UpgradeScene],
     physics: { 
         default: 'arcade',
         arcade: {
