@@ -19,6 +19,7 @@ import { BootScene } from './scenes/BootScene.js';
 import { StatType } from './scripts/Stats.js';
 import { GameState } from './scripts/GameState.js';
 import { UpgradeScene } from './scenes/UpgradeScene.js';
+import {SelectShipScene} from './scenes/SelectShipScene.js';
 
 
 
@@ -721,7 +722,7 @@ await this.processEnemyAttackOnly();
 
 const config = {
     type: Phaser.AUTO,
-    scene: [BootScene,SelectLevelScene,SpaceScene,ReportScene,EditorScene,UpgradeScene],
+    scene: [BootScene,SelectShipScene,SelectLevelScene,SpaceScene,ReportScene,EditorScene,UpgradeScene],
     physics: { 
         default: 'arcade',
         arcade: {

@@ -89,10 +89,11 @@ export class BootScene extends Phaser.Scene {
     });
     this.load.image('ship', 'assets/playership.png');
     this.load.image('playable_ozzy', 'assets/playableships/ozzy.png');
+    this.load.image('playable_needle', 'assets/playableships/needle.png');
+
 
     this.load.image('asteroid256', 'assets/asteroid256.png');
     this.load.image('coin', 'assets/astronaut.png');
-    this.load.image('background', 'assets/background0.png');
     this.load.image('escape', 'assets/blackhole.png');
     this.load.image('reticle', 'assets/reticle.png');
     this.load.image('shieldhit', 'assets/spr_shield_64.png');
@@ -100,12 +101,19 @@ export class BootScene extends Phaser.Scene {
     this.load.image('enemy_kamikaze', 'assets/enemies/destroyer.png');
     this.load.image('enemy_viper', 'assets/enemies/enemy_viper.png');
     this.load.image('pivot', 'assets/reticle.png');
+
+    //backgrounds
+    this.load.image('background', 'assets/background0.png');
+    this.load.image('hangar0', 'assets/scenes/hangar0.png');
+
   }
 
   create() {
     this.game.soundManager = new SoundManager(this); // Initialize singleton
     //initialize player ship
     GameState.shipData = createShipStats(ShipStatTemplates.standard);
+    //this.scene.start('SelectShipScene');
     this.scene.start('SelectLevelScene');
+
   }
 }

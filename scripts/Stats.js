@@ -33,9 +33,9 @@ export const EnemyShipTemplates ={
     },
     viper: {
       [StatType.SHIELD]: 100,
-      [StatType.HULL]: 150,
-      [StatType.ATTACK_POWER]: 20,
-      [StatType.ATTACK_RANGE]: 300,
+      [StatType.HULL]: 50,
+      [StatType.ATTACK_POWER]: 40,
+      [StatType.ATTACK_RANGE]: 500,
       [StatType.ATTACK_ANGLE]: 90,
        [StatType.MAXTURNANGLE]:90,
         [StatType.MAXSPEED]: 300
@@ -44,11 +44,11 @@ export const EnemyShipTemplates ={
     destroyer: {
       [StatType.SHIELD]: 200,
       [StatType.HULL]: 400,
-      [StatType.ATTACK_POWER]: 40,
+      [StatType.ATTACK_POWER]: 55,
       [StatType.ATTACK_RANGE]: 500,
-      [StatType.ATTACK_ANGLE]: 300,
-       [StatType.MAXTURNANGLE]: 60,
-        [StatType.MAXSPEED]: 150
+      [StatType.ATTACK_ANGLE]: 115,
+      [StatType.MAXTURNANGLE]: 60,
+      [StatType.MAXSPEED]: 300
     }
 }
 
@@ -56,21 +56,28 @@ export const EnemyShipTemplates ={
 export const ShipStatTemplates = {
   standard: {
     image:"ship",
-    [StatType.SHIELD]: 80,
+    [StatType.SHIELD]: 100,
     [StatType.HULL]: 100,
-    [StatType.ATTACK_POWER]: 30,
-    [StatType.ATTACK_RANGE]: 700,
-    [StatType.ATTACK_ANGLE]: 120
+    [StatType.ATTACK_POWER]: 50,
+    [StatType.ATTACK_RANGE]: 500,
+    [StatType.ATTACK_ANGLE]: 90
 
   },
   cruiser: {
     image:"playable_ozzy",
     [StatType.SHIELD]: 150,
-    [StatType.HULL]: 300,
-    [StatType.ATTACK_POWER]: 20,
+    [StatType.HULL]: 50,
+    [StatType.ATTACK_POWER]: 25,
     [StatType.ATTACK_RANGE]: 400,
     [StatType.ATTACK_ANGLE]: 120
-
+  },
+  needle: {
+    image:"playable_needle",
+    [StatType.SHIELD]: 150,
+    [StatType.HULL]: 50,
+    [StatType.ATTACK_POWER]: 100,
+    [StatType.ATTACK_RANGE]: 800,
+    [StatType.ATTACK_ANGLE]: 30
   }
 };
 

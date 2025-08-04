@@ -72,6 +72,17 @@ proceduralLevels.forEach(level => {
           }
         });
 
+            //ship select
+        this.createHtmlButton({
+          title: "Select ship",
+          createdby: "devs",
+          difficulty: "devs",
+          onClick: () => {
+            ui.style.display = 'none';
+            this.scene.start('SelectShipScene', { });
+          }
+        });
+
         // Inside create() in SelectLevelScene, after other buttons:
 this.createHtmlButton({
   title: "Upgrades",

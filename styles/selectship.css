@@ -1,0 +1,36 @@
+
+    #statsPanel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 250px;
+      background: rgba(0,0,0,0.7);
+      border: 2px solid #555;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    #statsPanel h2 {
+      text-align: center;
+      margin: 5px 0 10px;
+    }
+
+    #statsList {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    #confirmBtn {
+      display: block;
+      margin: 10px auto 0;
+      padding: 8px 15px;
+      background: #28a745;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #confirmBtn:hover {
+      background: #218838;
+    }

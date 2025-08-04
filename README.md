@@ -21,19 +21,14 @@ https://opengameart.org/content/shmup-ships
 
 #todo
 
+Improve destroyer - maybe it spawns fighters? / tractor beam
 Zoom button
-Asteroid piercer
-clean up ui
 Try again to move camera when combat
 make a "ready label" to show the player can play again
 make viper more intelligent (slow when close)
 damaged ships should get some smoke
 bug: overheating explosion -> Mission failed
-attack cone for player: maybe 2 modes?
-check if you can shoot through asteroids % of the time?
 Bug: if the enemy is inside of an asteroid, they skip their attack
 Max moves system
-Sprite pass (astronaut, enemies, asteroids)
-
 end level -> select next level + upgrade ship
-
+Asteroid piercer
