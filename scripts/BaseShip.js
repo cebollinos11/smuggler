@@ -4,7 +4,7 @@ import { animateShipAiming, animateShipShooting, flashSprite } from './utils/com
 import { RENDER_LAYERS } from './utils/rendering.js';
 import { showExplosion, showShieldsGettingHit, createFloatingText, animatePlayerExploding } from './utils/animations.js';
 import { createShipStats, StatType } from './Stats.js';
-
+import { drawConePreview } from './utils/cone.js';
 export class BaseShip {
     constructor(scene, sprite, x, y, stats) {
         this.isPlayer = false;
@@ -115,7 +115,7 @@ export class BaseShip {
         const attackAngle = this.stats[StatType.ATTACK_ANGLE].current;
 
         const enemygroup = this.isPlayer ? this.scene.enemies : { getChildren: () => [this.scene.ship.sprite] };
-        this.scene.drawConePreview(this.sprite.x, this.sprite.y, this.sprite.angle, attackRange, attackAngle);
+        drawConePreview(this.scene,this.sprite.x, this.sprite.y, this.sprite.angle, attackRange, attackAngle);
 
         const result = this.scene.findTargetsInConeRange(this.sprite, enemygroup, attackRange, attackAngle);
 

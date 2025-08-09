@@ -16,12 +16,12 @@ import { handleBorderPivots } from './scripts/utils/BorderPivots.js'; // Import 
 import { delay } from './scripts/utils/timing.js';
 import { EditorScene } from './scenes/EditorScene.js';
 import { BootScene } from './scenes/BootScene.js';
-import { StatType } from './scripts/Stats.js';
+import { StatType,EnemyShipTemplates } from './scripts/Stats.js';
 import { GameState } from './scripts/GameState.js';
 import { UpgradeScene } from './scenes/UpgradeScene.js';
 import {SelectShipScene} from './scenes/SelectShipScene.js';
-
-
+import { drawConePreview, initDrawCone,cleanCone } from './scripts/utils/cone.js';
+import {SelectMissionScene} from './scenes/SelectMissionScene.js';
 
 window.DEBUGMODE = false; // Set to true to enable debug mode
 let sceneRef;
@@ -255,7 +255,6 @@ class SpaceScene extends Phaser.Scene {
         const zoom = targetShipWidth / 64; // 64 = ship original width
         this.cameras.main.setZoom(zoom);  
         
-        this.coneGraphics = this.add.graphics();
         
         this.commandInProgress = false;
         
@@ -290,23 +289,56 @@ class SpaceScene extends Phaser.Scene {
         
         (levelData.enemies || []).forEach(data => {
             let enemySprite;
-            switch (data.enemy_type) {
-                case 'probe':
-                    enemySprite = this.enemies.create(data.x, data.y, 'enemy_probe');
-                    new ProbeEnemy(this, enemySprite, data.x, data.y);
-                    break;
-                    case 'kamikaze':
-                    enemySprite = this.enemies.create(data.x, data.y, 'enemy_kamikaze');
-                    new KamikazeEnemy(this, enemySprite, data.x, data.y);
-                    break;
-                case 'viper':
-                    enemySprite = this.enemies.create(data.x, data.y, 'enemy_viper');
-                    new ViperEnemy(this, enemySprite, data.x, data.y);
-                    break;
-                default:
-                    console.warn('Unknown enemy type:', data.enemy_type);
-                    return;
-                }
+switch (data.enemy_type) {
+    case 'basic_turret':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_basic_turret');
+        new ProbeEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.basic_turret);
+        break;
+    case 'probe':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_probe');
+        new ProbeEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.probe);
+        break;
+    case 'destroyer':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_kamikaze');
+        new ViperEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.destroyer);
+        break;
+    case 'viper':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_viper');
+        new ViperEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.viper);
+        break;
+    case 'ghost':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_ghost');
+        new ViperEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.ghost);
+        break;
+    case 'deathstar':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_deathstar');
+        new ProbeEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.deathstar);
+        break;
+    case 'carrier':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_carrier');
+        new ViperEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.carrier); // Consider creating CarrierEnemy class
+        break;
+    case 'mine':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_mine');
+        new ProbeEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.mine); // Consider creating MineEnemy class
+        break;
+    case 'turret':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_turret');
+        new ProbeEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.turret);
+        break;
+    case 'advanced_viper':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_advanced_viper');
+        new ViperEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.advanced_viper);
+        break;
+    case 'dreadnoght':
+        enemySprite = this.enemies.create(data.x, data.y, 'enemy_dreadnoght');
+        new ViperEnemy(this, enemySprite, data.x, data.y, EnemyShipTemplates.dreadnoght);
+        break;
+    default:
+        console.warn('Unknown enemy type:', data.enemy_type);
+        return;
+}
+
         });
         
         this.physics.add.overlap(this.enemies, this.asteroids, (enemy) => enemy.getData("controller").OnOverlappingAsteroid(enemy), null, this);
@@ -347,7 +379,8 @@ class SpaceScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-X', () => {
-            this.ship.takeDamage(10);
+                    drawConePreview(this,this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
+
 
         });
         
@@ -356,8 +389,9 @@ class SpaceScene extends Phaser.Scene {
 
         //radar
         this.radar = new Radar(this, this.ship.sprite);
-
-        this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
+        //cones
+        initDrawCone(this);
+        drawConePreview(this,this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
 
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -390,35 +424,7 @@ class SpaceScene extends Phaser.Scene {
         });
     }
     
-    drawConePreview(originx,originy,shipangle, range, coneangle) {
-        //if (!window.DEBUGMODE) return;
 
-        if (!this.coneGraphics) {
-            this.coneGraphics = this.add.graphics();
-        } else {
-            this.coneGraphics.clear();
-        }
-        this.coneGraphics.setDepth(RENDER_LAYERS.ABOVE_PLAYER); // Ensure cone is above everything else
-        const shipX = originx;
-        const shipY = originy;
-        const halfAngle = coneangle / 2;
-
-        const shipAngleRad = Phaser.Math.DegToRad(shipangle);
-        const startAngle = shipAngleRad - Phaser.Math.DegToRad(halfAngle);
-        const endAngle = shipAngleRad + Phaser.Math.DegToRad(halfAngle);
-
-        this.coneGraphics.fillStyle(0xff0000, 0.1); // green, transparent
-        this.coneGraphics.slice(shipX, shipY, range, startAngle, endAngle, false);
-        this.coneGraphics.fillPath();
-
-        this.coneGraphics.lineStyle(3, 0xff0000, 0.2);
-        this.coneGraphics.beginPath();
-        this.coneGraphics.moveTo(shipX, shipY);
-        this.coneGraphics.arc(shipX, shipY, range, startAngle, endAngle, false);
-        this.coneGraphics.lineTo(shipX, shipY);
-        this.coneGraphics.closePath();
-        this.coneGraphics.strokePath();
-    }
 
 
     update(time, delta) {
@@ -597,7 +603,7 @@ async processEnemyAttackOnly() {
 //                 });
 
                 step++;
-                this.drawConePreview(this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
+                drawConePreview(this,this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
                 if (step >= steps) {
                     this.arcTimer.remove();
                     this.OnPlayerMovementComplete(); 
@@ -608,6 +614,8 @@ async processEnemyAttackOnly() {
     }
 
     async OnPlayerMovementComplete() {
+
+        cleanCone(this);
 
         //check if player has hit a border wall
         if(this.ship.hitBorderWall){            
@@ -691,6 +699,9 @@ await this.processEnemyAttackOnly();
             controller.OnTurnStarts();
             
         });
+
+                drawConePreview(this,this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
+
     }
 
 //     enemiesPredictPosition()
@@ -722,7 +733,7 @@ await this.processEnemyAttackOnly();
 
 const config = {
     type: Phaser.AUTO,
-    scene: [BootScene,SelectShipScene,SelectLevelScene,SpaceScene,ReportScene,EditorScene,UpgradeScene],
+    scene: [BootScene,SelectMissionScene,SelectShipScene,SelectLevelScene,SpaceScene,ReportScene,EditorScene,UpgradeScene],
     physics: { 
         default: 'arcade',
         arcade: {

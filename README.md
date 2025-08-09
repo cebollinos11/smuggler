@@ -32,3 +32,17 @@ Bug: if the enemy is inside of an asteroid, they skip their attack
 Max moves system
 end level -> select next level + upgrade ship
 Asteroid piercer
+
+Plan
+Create a structure of Enemies > difficulty
+Improve level generator so it uses enemy tiers
+generate missions
+Roguelike modeedit
+
+Mission Generator:
+params:
+    Difficulty Level
+    Mission type
+        - Destroy X ships of type X
+        - Collect X coins
+        - Deliver package in less than X turns

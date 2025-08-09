@@ -1,5 +1,6 @@
-import { ShipStatTemplates, createShipStats, StatDefaults } from '../scripts/Stats.js';
+import { ShipStatTemplates, createShipStats, StatDefaults,StatType } from '../scripts/Stats.js';
 import { GameState } from '../scripts/GameState.js'; // your GameState file
+import { initDrawCone, drawConePreview } from '../scripts/utils/cone.js';
 
 export class SelectShipScene extends Phaser.Scene {
 constructor() {
@@ -29,7 +30,7 @@ getColorForPercent(pct) {
 
 create() {
   this.shipSprites = [];
-  
+  initDrawCone(this);
   //background
    const bgimage = this.add.image(0, 0, 'hangar0').setScale(1).setDepth(-1);
 
@@ -62,7 +63,10 @@ create() {
         .setScale(1);
       sprite.angle = -90;
       sprite.shipKey = shipKey;
-      sprite.on('pointerdown', () => this.selectShip(shipKey));
+      sprite.on('pointerdown', () => {
+        this.game.soundManager.playSFX('click');
+        this.selectShip(shipKey);
+      }); 
     } else {
       // Placeholder
       sprite = this.add.rectangle(x, y, 64, 64, 0xffffff).setAlpha(0.5)
@@ -78,10 +82,7 @@ create() {
     this.shipSprites.push(sprite);
   }
 
-  // Reticle
-  this.reticle = this.add.image(0, 0, 'reticle').setVisible(false);
-  this.reticle.setScale(1.2);
-  this.reticle.setDepth(10);
+
 
   const targetShipWidth = this.scale.width * 0.05; // 5% of viewport width
         const zoom = targetShipWidth / 64; // 64 = ship original width
@@ -146,6 +147,7 @@ calculateMaxStats() {
 
 
 selectShip(shipKey) {
+
   this.selectedShipKey = shipKey;
   let shipStats = createShipStats(ShipStatTemplates[shipKey]);
 
@@ -161,7 +163,7 @@ selectShip(shipKey) {
 
     statsHTML += `
       <div style="margin-bottom: 8px;">
-        <strong>${stat}:</strong> ${value}
+        <strong>${shipStats[stat].displayName}:</strong> ${value}
         <div class="stat-bar-container" style="
           background: #444;
           width: ${barMaxWidth}px;
@@ -205,8 +207,7 @@ selectShip(shipKey) {
   // Move reticle over selected ship
   let selectedSprite = this.shipSprites.find(s => s.shipKey === shipKey);
   if (selectedSprite) {
-    this.reticle.setPosition(selectedSprite.x, selectedSprite.y);
-    this.reticle.setVisible(true);
+
 
     this.cameras.main.pan(
       selectedSprite.x,
@@ -215,6 +216,23 @@ selectShip(shipKey) {
       'Sine.easeInOut'
     );
   }
+
+    // Draw aim cone using ship's attack stats
+  const attackRange = shipStats[StatType.ATTACK_RANGE].base;
+  const attackAngle = shipStats[StatType.ATTACK_ANGLE].base;
+
+  selectedSprite = this.shipSprites.find(s => s.shipKey === shipKey);
+  if (selectedSprite) {
+    drawConePreview(
+      this,
+      selectedSprite.x,
+      selectedSprite.y,
+      -90,           // shipAngle in degrees; defaulting to 90 (up)
+      attackRange,
+      attackAngle
+    );
+  }
+
 }
 
 

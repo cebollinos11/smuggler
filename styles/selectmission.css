@@ -1,0 +1,31 @@
+#mission-ui {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    font-family: sans-serif;
+}
+
+.mission-card {
+    background: #222;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: 1px solid #555;
+}
+
+.mission-card button {
+    margin-top: 5px;
+    background: #0f0;
+    color: black;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.mission-card button:hover {
+    background: #4f4;
+}

@@ -90,6 +90,8 @@ export class BootScene extends Phaser.Scene {
     this.load.image('ship', 'assets/playership.png');
     this.load.image('playable_ozzy', 'assets/playableships/ozzy.png');
     this.load.image('playable_needle', 'assets/playableships/needle.png');
+    this.load.image('playable_ball', 'assets/playableships/ball.png');
+
 
 
     this.load.image('asteroid256', 'assets/asteroid256.png');
@@ -100,6 +102,15 @@ export class BootScene extends Phaser.Scene {
     this.load.image('enemy_probe', 'assets/enemies/enemy_probe.png');
     this.load.image('enemy_kamikaze', 'assets/enemies/destroyer.png');
     this.load.image('enemy_viper', 'assets/enemies/enemy_viper.png');
+    this.load.image('enemy_basic_turret', 'assets/enemies/basic_turret.png');
+    this.load.image('enemy_ghost', 'assets/enemies/enemy_ghost.png');
+    this.load.image('enemy_deathstar', 'assets/enemies/enemy_deathstar.png');
+    this.load.image('enemy_carrier', 'assets/enemies/enemy_carrier.png');
+    this.load.image('enemy_mine', 'assets/enemies/enemy_mine.png');
+    this.load.image('enemy_turret', 'assets/enemies/enemy_turret.png');
+    this.load.image('enemy_advanced_viper', 'assets/enemies/enemy_advanced_viper.png');
+    this.load.image('enemy_dreadnoght', 'assets/enemies/enemy_dreadnoght.png');
+
     this.load.image('pivot', 'assets/reticle.png');
 
     //backgrounds
@@ -113,7 +124,8 @@ export class BootScene extends Phaser.Scene {
     //initialize player ship
     GameState.shipData = createShipStats(ShipStatTemplates.standard);
     //this.scene.start('SelectShipScene');
-    this.scene.start('SelectLevelScene');
+    //this.scene.start('SelectMissionScene');
+    this.scene.start("SelectLevelScene");
 
   }
 }
