@@ -31,7 +31,8 @@ export class SelectMissionScene extends Phaser.Scene {
 
             card.querySelector('button').addEventListener('click', () => {
                 this.cleanupUI();
-
+            // Save selected mission in GameState
+            GameState.run.currentMission = mission;
                 // Calculate size based on threat (1 → 1000px, 10 → 5000px)
                 const baseSize = 1000;
                 const maxSize = 5000;
@@ -46,7 +47,8 @@ export class SelectMissionScene extends Phaser.Scene {
                     enemyCount: mission.threat + 2,
                     difficulty: mission.threat
                 });
-
+                
+                GameState.run.currentMission.levelData = levelData;
                 this.scene.start('SpaceScene', { levelData });
             });
 

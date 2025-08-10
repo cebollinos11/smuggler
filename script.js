@@ -140,7 +140,10 @@ class SpaceScene extends Phaser.Scene {
             return;
         }
 
-        //sound manager
+        //mission things
+        GameState.run.currentMission.coinsCollected = 0;
+        GameState.run.currentMission.timeRemaining = 0;
+        GameState.run.currentMission.enemiesDestroyed = 0;
 
         this.isUTurnEnabled = false; // Initialize U-turn toggle
         this.overheat = 0;
@@ -364,18 +367,11 @@ switch (data.enemy_type) {
             this.ship.resetStats();
             GameState.shipData = this.ship.stats;
 
-            animatePlayerExit(this, this.ship, this.exit).then(() => {
-                console.log("Player exited the level!");
-            });
+
             this.scene.stop('SpaceScene'); // or
             //load ReportScene
-            this.scene.launch('ReportScene', {
-                levelData: this.levelData,
-                ship: this.ship,
-                enemies: this.enemies.getChildren(),
-                coinsCollected: this.coins.getChildren().length,
-                asteroidsDestroyed: this.asteroids.getChildren().length
-            });
+            GameState.run.currentMission.missionFailed = false; // Set mission success state
+            this.scene.launch('ReportScene');
         });
 
         this.input.keyboard.on('keydown-X', () => {
@@ -509,6 +505,7 @@ async processEnemyAttackOnly() {
             if (this.ship.stats[StatType.HULL].current < 1) {
                 console.log("Player ship destroyed by enemy!");
                 await animatePlayerExploding(this, this.ship);
+                GameState.run.currentMission.missionFailed = true; // Set mission failed state
                 this.scene.start('ReportScene', {
                     missionFailed: true
                 });
@@ -620,18 +617,17 @@ async processEnemyAttackOnly() {
         //check if player has hit a border wall
         if(this.ship.hitBorderWall){            
             await animatePlayerExploding(this, this.ship);
-            this.scene.start('ReportScene', {
-                missionFailed: true
-            });
+            GameState.run.currentMission.missionFailed = true; // Set mission failed state
+            this.scene.start('ReportScene');
             return;
         }
 
         //check if player has hit an asteroid and died
         if(this.ship.stats[StatType.HULL].current  < 1) {
+            GameState.run.currentMission.missionFailed = true; // Set mission failed state
+
             await animatePlayerExploding(this, this.ship);
-            this.scene.start('ReportScene', {
-                missionFailed: true
-            });
+            this.scene.start('ReportScene');
             return;
         }
         //check if player is inside the exit
@@ -645,12 +641,9 @@ async processEnemyAttackOnly() {
             this.ship.resetStats();
             GameState.shipData  = this.ship.stats;
             //Trigger level completion logic here
-            this.scene.start('ReportScene', {
-                missionFailed: false,
-                coinsCollected: this.coinsCollected,
-                timeRemaining: this.levelTimeRemaining,
-                enemiesDestroyed: this.enemiesDestroyed
-            });
+            GameState.run.currentMission.missionFailed = false; // Set mission success state
+            
+            this.scene.start('ReportScene');
 
            
             return;
