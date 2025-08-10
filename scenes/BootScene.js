@@ -124,8 +124,8 @@ export class BootScene extends Phaser.Scene {
     //initialize player ship
     GameState.shipData = createShipStats(ShipStatTemplates.standard);
     //this.scene.start('SelectShipScene');
-    //this.scene.start('SelectMissionScene');
-    this.scene.start("SelectLevelScene");
+    this.scene.start('SelectMissionScene');
+    // this.scene.start("SelectLevelScene");
 
   }
 }

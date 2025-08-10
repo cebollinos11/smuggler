@@ -1,17 +1,21 @@
+import { generateLevel } from "../scripts/utils/levelgenerator.js";
+import { GameState } from "../scripts/GameState.js";
+
 export class SelectMissionScene extends Phaser.Scene {
     constructor() {
         super('SelectMissionScene');
     }
 
     create() {
-        this.missions = this.generateMissions();
+        const currentLevel = GameState.run.currentLevel;
+        this.missions = this.generateMissions(currentLevel);
 
-        // Create a container div for the mission UI
+        // Create mission UI
         this.ui = document.createElement('div');
         this.ui.id = 'mission-ui';
 
         const title = document.createElement('h2');
-        title.textContent = 'Choose Your Next Mission';
+        title.textContent = `Choose Your Next Mission (Current Level: ${currentLevel})`;
         this.ui.appendChild(title);
 
         this.missions.forEach((mission, i) => {
@@ -24,35 +28,49 @@ export class SelectMissionScene extends Phaser.Scene {
                 Reward: ${mission.reward} credits<br>
                 <button>Select</button>
             `;
+
             card.querySelector('button').addEventListener('click', () => {
                 this.cleanupUI();
-                this.scene.start('PlayMissionScene', { mission });
+
+                // Calculate size based on threat (1 → 1000px, 10 → 5000px)
+                const baseSize = 1000;
+                const maxSize = 5000;
+                const size = baseSize + (mission.threat - 1) * ((maxSize - baseSize) / (10 - 1));
+
+                // Generate level based on mission
+                const levelData = generateLevel({
+                    width: size,
+                    height: size,
+                    asteroidCount: Phaser.Math.Between(10, 30),
+                    coinCount: Phaser.Math.Between(3, 8),
+                    enemyCount: mission.threat + 2,
+                    difficulty: mission.threat
+                });
+
+                this.scene.start('SpaceScene', { levelData });
             });
+
             this.ui.appendChild(card);
         });
 
         document.body.appendChild(this.ui);
 
-
-                // Add Upgrade Ship button
+        // Upgrade Ship button
         const upgradeBtn = document.createElement('button');
         upgradeBtn.innerText = 'Upgrade Ship';
         upgradeBtn.style.position = 'absolute';
         upgradeBtn.style.bottom = '20px';
         upgradeBtn.style.left = '50px';
         upgradeBtn.onclick = () => {
-            this.cleanupUI(); // Remove current scene's HTML
-            this.scene.start('UpgradeScene', {
-                previousScene: 'SelectMissionScene'
-            });
+            this.cleanupUI();
+            this.scene.start('UpgradeScene', { previousScene: 'SelectMissionScene' });
         };
         document.body.appendChild(upgradeBtn);
 
-        this.upgradeBtn = upgradeBtn; // Store for cleanup
-
+        this.upgradeBtn = upgradeBtn;
     }
 
- cleanupUI() {
+    cleanupUI() {
         if (this.ui) {
             document.body.removeChild(this.ui);
             this.ui = null;
@@ -62,13 +80,36 @@ export class SelectMissionScene extends Phaser.Scene {
             this.upgradeBtn = null;
         }
     }
-    generateMissions() {
+
+    generateMissions(currentLevel) {
         const types = ['Destroy', 'Escort', 'Collect'];
-        return Array.from({ length: 3 }, () => ({
-            type: Phaser.Utils.Array.GetRandom(types),
-            threat: Phaser.Math.Between(1, 5),
-            reward: Phaser.Math.Between(100, 500)
-        }));
+
+        // Reward formula
+        const getReward = (threat) => {
+            const baseReward = 100;
+            const rewardPerThreat = 75; // credits per threat level
+            return baseReward + (threat * rewardPerThreat);
+        };
+
+        const missions = [
+            {
+                type: Phaser.Utils.Array.GetRandom(types),
+                threat: currentLevel,
+                reward: getReward(currentLevel)
+            },
+            {
+                type: Phaser.Utils.Array.GetRandom(types),
+                threat: currentLevel,
+                reward: getReward(currentLevel)
+            },
+            {
+                type: Phaser.Utils.Array.GetRandom(types),
+                threat: currentLevel + 1,
+                reward: getReward(currentLevel + 1)
+            }
+        ];
+
+        return missions;
     }
 
     shutdown() {

@@ -1,7 +1,7 @@
 export const GameState = {
     shipData: null,
     run:{
-        currentLevel: 0,
+        currentLevel: 1,
         score: 0,
         credits: 100
     }
