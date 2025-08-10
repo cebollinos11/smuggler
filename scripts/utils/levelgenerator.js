@@ -1,3 +1,5 @@
+import { getRandomEnemy } from "../enemies/enemySpawner.js";
+
 export function generateLevel({
   width = 8000,
   height = 6000,
@@ -7,7 +9,8 @@ export function generateLevel({
   enemyCount = 3,
   minEnemyDistance = 150,
   minCoinDistance = 50,
-  borderSegmentsPerSide = 1
+  borderSegmentsPerSide = 1,
+  difficulty = 1
 } = {}) {
   const level = {
     title: "Trouble in the Asteroid Belt",
@@ -67,8 +70,19 @@ export function generateLevel({
     }
   }
 
-  // Enemies
-  const enemyTypes = ["probe", "kamikaze", "viper"];
+// Enemies
+const basicEnemies = ["probe", "viper", "basic_turret"];
+const advancedEnemies = ["mine", "turret", "advanced_viper", "destroyer"];
+const eliteEnemies = ["ghost", "carrier", "deathstar", "dreadnoght"];
+
+
+  const enemyTypes = [
+    ...basicEnemies,
+    ...(difficulty >= 3 ? advancedEnemies : []),
+    ...(difficulty >= 6 ? eliteEnemies : [])
+  ];
+
+
   while (level.enemies.length < enemyCount) {
     const pos = { x: getRandomInt(borderSize, width - borderSize), y: getRandomInt(borderSize, height - borderSize) };
     if (
@@ -79,8 +93,8 @@ export function generateLevel({
       level.enemies.push({
         x: pos.x,
         y: pos.y,
-        enemy_type: enemyTypes[Math.floor(Math.random() * enemyTypes.length)]
-      });
+        enemy_type: getRandomEnemy(difficulty)
+            });
     }
   }
 

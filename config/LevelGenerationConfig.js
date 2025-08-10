@@ -10,7 +10,8 @@ export const proceduralLevels = [
       coinCount: 3,
       enemyCount: 0,
       minEnemyDistance: 150,
-      minCoinDistance: 50
+      minCoinDistance: 50,
+      difficulty: 1
     }
   },
   {
@@ -24,7 +25,8 @@ export const proceduralLevels = [
       coinCount: 3,
       enemyCount: 3,
       minEnemyDistance: 150,
-      minCoinDistance: 50
+      minCoinDistance: 50,
+      difficulty: 3
     }
   },
   {
@@ -38,7 +40,8 @@ export const proceduralLevels = [
       coinCount: 5,
       enemyCount: 5,
       minEnemyDistance: 150,
-      minCoinDistance: 50
+      minCoinDistance: 50,
+      difficulty: 5
     }
   },
   {
@@ -52,7 +55,8 @@ export const proceduralLevels = [
       coinCount: 10,
       enemyCount: 10,
       minEnemyDistance: 150,
-      minCoinDistance: 50
+      minCoinDistance: 50,
+      difficulty: 9
     }
   }
 ];
