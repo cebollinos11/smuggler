@@ -6,8 +6,11 @@ import {
     initUI,
     setUIEnabled,
     updateShieldHullUI,
-    updateOverheatBarUI
+    updateOverheatBarUI,
+    updateMissionRewardUI
 } from './view.js';
+
+import { GameState } from '../GameState.js';
 
 
 let sceneRef = null;
@@ -46,6 +49,7 @@ export function UIOnNewTurn(zapped = false) {
     sceneRef.isUTurnEnabled = false;
     updateOverheatPreview();
     setUIEnabled(true);
+    updateMissionRewardUI(GameState.run.currentMission,GameState.run.currentMission.progress);
 }
 
 

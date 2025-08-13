@@ -64,8 +64,8 @@ export class BootScene extends Phaser.Scene {
 
     // === Assets ===
     // Music
-    this.load.audio('bgm', 'assets/sound/music/flesh.mp3');
-    this.load.audio('bgm_gameplay', 'assets/sound/music/nebulae.mp3');
+    // this.load.audio('bgm', 'assets/sound/music/flesh.mp3');
+    // this.load.audio('bgm_gameplay', 'assets/sound/music/nebulae.mp3');
 
     // UI
     this.load.audio('click', 'assets/sound/sfx/click.wav');

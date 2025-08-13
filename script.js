@@ -22,6 +22,7 @@ import { UpgradeScene } from './scenes/UpgradeScene.js';
 import {SelectShipScene} from './scenes/SelectShipScene.js';
 import { drawConePreview, initDrawCone,cleanCone } from './scripts/utils/cone.js';
 import {SelectMissionScene} from './scenes/SelectMissionScene.js';
+import { Progress } from './scripts/Progress.js';
 
 window.DEBUGMODE = false; // Set to true to enable debug mode
 let sceneRef;
@@ -127,9 +128,6 @@ class SpaceScene extends Phaser.Scene {
 
 
     create() {
-
-
-        
         if (this.levelPath) {
             this.levelData = this.cache.json.get('levelData');
         }
@@ -141,9 +139,10 @@ class SpaceScene extends Phaser.Scene {
         }
 
         //mission things
-        GameState.run.currentMission.coinsCollected = 0;
-        GameState.run.currentMission.timeRemaining = 0;
-        GameState.run.currentMission.enemiesDestroyed = 0;
+        if(!GameState.run.currentMission) {
+            GameState.run.currentMission = {}
+        }
+        GameState.run.currentMission.progress = new Progress();
 
         this.isUTurnEnabled = false; // Initialize U-turn toggle
         this.overheat = 0;
@@ -375,10 +374,11 @@ switch (data.enemy_type) {
         });
 
         this.input.keyboard.on('keydown-X', () => {
-                    drawConePreview(this,this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
-
-
+           // onShipCoinCollision(this, this.ship.sprite, this.coins.getChildren()[0]);
+           //player ship take damage
+            this.ship.takeDamage(100);
         });
+
         
         // Improved camera dragging
         setupCameraControls(this);
@@ -668,8 +668,7 @@ await this.processEnemyAttackOnly();
         if (this.arcPreview) this.arcPreview.clear();
         this.storeOriginalYValues();
 
-        UIOnNewTurn();
-        this.panLocked = false;
+        
         this.onTurnStarts();
     }
 
@@ -693,7 +692,9 @@ await this.processEnemyAttackOnly();
             
         });
 
-                drawConePreview(this,this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
+        drawConePreview(this,this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
+        UIOnNewTurn();
+        this.panLocked = false;
 
     }
 

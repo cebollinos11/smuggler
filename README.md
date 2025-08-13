@@ -21,6 +21,21 @@ https://opengameart.org/content/shmup-ships
 
 #todo
 
+make it so the progress is an object with methods
+use methods to increase variables
+bind to the ui controller
+make the report scene use the progress object
+
+make it so the gameplay scene shows the win condition
+make it so the reward scene check for win condition
+- mission completed
+- mission failed
+- you died
+ Collect
+ Smuggle
+ Destroy
+
+
 Improve destroyer - maybe it spawns fighters? / tractor beam
 Zoom button
 Try again to move camera when combat

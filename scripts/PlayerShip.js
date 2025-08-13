@@ -4,6 +4,7 @@ import { BaseShip } from './BaseShip.js';
 import { UISetShieldHullLevels } from './ui/controller.js';
 import { animatePlayerExploding } from './utils/animations.js';
 import { ShipStatTemplates,StatType } from './Stats.js'; 
+import { GameState } from './GameState.js';
 export class PlayerShip extends BaseShip { 
  constructor(scene, sprite, x, y,shipdata) {
         super(scene, sprite, x, y, shipdata);
@@ -24,6 +25,10 @@ export class PlayerShip extends BaseShip {
     {
         super.takeDamage(amount);
         this.updateUI();
+        if(this.stats[StatType.HULL].current <= 0) {
+            GameState.run.currentMission.progress.playerShipExploded = true; // Set game-over condition
+        }
+        
     }
 
     updateUI()

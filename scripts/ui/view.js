@@ -1,3 +1,5 @@
+import {GameState} from '../GameState.js';
+
 let controller = null;
 let alreadyInit = false;
 let sceneRef = null;
@@ -30,6 +32,28 @@ function createToggleButton(buttonEl, onLabel, offLabel, initialState = false, c
 
     updateUI();
 }
+export function updateMissionRewardUI(mission, progress) {
+    const el = document.getElementById('missionReward');
+    if (!el) return;
+
+    if (!mission || !mission.rewardCondition) {
+        el.innerText = "No mission";
+        return;
+    }
+
+    const { rewardCondition } = mission;
+
+    const objectiveText = rewardCondition.toString();
+    const progressText = progress
+        ? rewardCondition.printProgress(progress)
+        : "";
+
+    el.innerText = progressText
+        ? `Mission: ${objectiveText}\n${progressText}`
+        : `Mission: ${objectiveText}`;
+}
+
+
 
 export function initUI(viewController, scene) {
     if (alreadyInit) return;
@@ -173,6 +197,9 @@ export function initUI(viewController, scene) {
             sceneRef.game.soundManager.playSFX("keypress");
         }
     });
+
+        if (GameState?.run?.currentMission) {
+    }
 }
 
 export function updateShieldHullUI(shieldPercent, hullPercent, shieldRaw = null, shieldMax = null, hullRaw = null, hullMax = null) {

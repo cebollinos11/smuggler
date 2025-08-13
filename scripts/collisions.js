@@ -1,5 +1,6 @@
 // scripts/collisions.js
 import { RENDER_LAYERS } from './utils/rendering.js';
+import { GameState } from './GameState.js';
 
 export function onShipCoinCollision(scene, ship, coin) {
     // Disable collisions
@@ -19,6 +20,7 @@ export function onShipCoinCollision(scene, ship, coin) {
         onComplete: () => {
             coin.destroy();
             console.log("Coin collected!");
+            GameState.run.currentMission.progress.addCoins();
         }
     });
 }
