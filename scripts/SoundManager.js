@@ -25,7 +25,14 @@ export class SoundManager {
    * @param {object} config - Optional config, e.g., { loop: true, volume: 0.5 }
    */
   playMusic(key, config = { loop: true, volume: 0.5 }) {
-    return;//remove this
+
+        // Check if audio exists
+    if (!this.sound.get(key) && !this.scene.cache.audio.exists(key)) {
+      console.warn(`Music key "${key}" not found. Skipping playback.`);
+      return;
+    }
+    
+    // return;//remove this
     if (this.music && this.music.key === key && this.music.isPlaying) {
       return; // Already playing
     }

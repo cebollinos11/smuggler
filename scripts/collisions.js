@@ -1,11 +1,13 @@
 // scripts/collisions.js
 import { RENDER_LAYERS } from './utils/rendering.js';
 import { GameState } from './GameState.js';
+import { flashSprite } from './utils/combat.js';
 
 export function onShipCoinCollision(scene, ship, coin) {
     // Disable collisions
     coin.body.enable = false;
-
+    //play sound
+    scene.game.soundManager.playSFX("coin_collect");
     // Bring coin to top (in case it's under something)
     coin.setDepth(100);
 
@@ -21,6 +23,7 @@ export function onShipCoinCollision(scene, ship, coin) {
             coin.destroy();
             console.log("Coin collected!");
             GameState.run.currentMission.progress.addCoins();
+            flashSprite(scene, ship, 3, 100,0x1de938ff); // Flash the ship to indicate coin collection
         }
     });
 }

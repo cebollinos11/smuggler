@@ -22,14 +22,14 @@ export class SelectMissionScene extends Phaser.Scene {
             let coinCount = Math.ceil(mission.threat / 2);
             if (Phaser.Math.Between(0, 1) === 1) coinCount++;
 
-            const baseSize = 3000;
+            const baseSize = 2000;
             const maxSize = 10000;
             const size = baseSize + (mission.threat - 1) * ((maxSize - baseSize) / (10 - 1));
 
             mission.levelData = generateLevel({
                 width: size,
                 height: size,
-                asteroidCount: Math.ceil(size / 100),
+                asteroidCount: Math.ceil((Phaser.Math.Between(1, 2))*size / 100),
                 coinCount,
                 enemyCount: mission.threat + Phaser.Math.Between(0, 1),
                 difficulty: mission.threat
@@ -121,8 +121,8 @@ export class SelectMissionScene extends Phaser.Scene {
     }
 
     generateMissions(currentLevel) {
-        //const types = ['Destroy', 'Escort', 'Collect'];
-        const types = ['Collect'];
+        const types = ['Destroy', 'Escort', 'Collect'];
+        // const types = ['Escort'];
         const getReward = threat => 100 + (threat * 75);
 
         return [

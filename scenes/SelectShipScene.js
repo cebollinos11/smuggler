@@ -9,8 +9,15 @@ constructor() {
   this.isDragging = false; 
   this.lastPointerPosition = new Phaser.Math.Vector2();
   this.previousStatPercents = {};  // Store previous stat bar percents
-}
+    this.previousSceneKey = null; // store where to go back
 
+}
+  init(data) {
+    // Store the previous scene name if provided
+    if (data && data.previousScene) {
+      this.previousSceneKey = data.previousScene;
+    }
+  }
 getColorForPercent(pct) {
   // pct is 0 to 100
   // We'll interpolate red -> yellow -> green
@@ -98,7 +105,12 @@ create() {
     const finalShipStats = createShipStats(ShipStatTemplates[this.selectedShipKey]);
     GameState.shipData = finalShipStats;
     document.getElementById('statsPanel').style.display = 'none';
-    this.scene.start('SelectLevelScene');
+     // Go back to previous scene if known, otherwise default
+      if (this.previousSceneKey) {
+        this.scene.start(this.previousSceneKey);
+      } else {
+        this.scene.start('SelectLevelScene');
+      }
   });
 
   document.getElementById('statsPanel').style.display = 'block';

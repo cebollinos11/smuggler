@@ -23,6 +23,7 @@ import {SelectShipScene} from './scenes/SelectShipScene.js';
 import { drawConePreview, initDrawCone,cleanCone } from './scripts/utils/cone.js';
 import {SelectMissionScene} from './scenes/SelectMissionScene.js';
 import { Progress } from './scripts/Progress.js';
+import { repositionTurrets } from './scripts/utils/repositionTurrets.js'; // Import the blink utility
 
 window.DEBUGMODE = false; // Set to true to enable debug mode
 let sceneRef;
@@ -374,9 +375,14 @@ switch (data.enemy_type) {
         });
 
         this.input.keyboard.on('keydown-X', () => {
-           // onShipCoinCollision(this, this.ship.sprite, this.coins.getChildren()[0]);
+            //animate exit
+            // animatePlayerExit(this, this.ship, this.exit);
+
+        //    onShipCoinCollision(this, this.ship.sprite, this.coins.getChildren()[0]);
            //player ship take damage
-            this.ship.takeDamage(100);
+             this.ship.takeDamage(1);
+            //one enemy take damage
+            // const enemy = this.enemies.getChildren()[0].getData('controller').takeDamage(100);
         });
 
         
@@ -394,6 +400,13 @@ switch (data.enemy_type) {
 
         //radar
         this.isRadarEnabled = false;
+
+        repositionTurrets(
+        this.enemies.getChildren(),
+        this.coins.getChildren(),
+        this.asteroids.getChildren(),
+        64/2 // optional offset
+    );
 
         setReferenceZoom(zoom); // Set reference zoom for UI
         this.storeOriginalYValues();//for the floating idle animation
@@ -444,8 +457,10 @@ switch (data.enemy_type) {
             });
 
             this.enemies.getChildren().forEach(enemy => {
-                enemy.setY(enemy.originalY + Math.sin(time * floatSpeed+ enemy.originalY) * floatHeight);
-            });
+            if (!enemy.getData('controller').stats?.isTurret) {
+                enemy.setY(enemy.originalY + Math.sin(time * floatSpeed + enemy.originalY) * floatHeight);
+            }
+        });
         }
 
 
@@ -691,7 +706,7 @@ await this.processEnemyAttackOnly();
             controller.OnTurnStarts();
             
         });
-
+        GameState.run.currentMission.progress.addTurn();
         drawConePreview(this,this.ship.sprite.x, this.ship.sprite.y, this.ship.sprite.angle, this.ship.stats[StatType.ATTACK_RANGE].current, this.ship.stats[StatType.ATTACK_ANGLE].current);
         UIOnNewTurn();
         this.panLocked = false;

@@ -54,7 +54,7 @@ export class RewardCondition {
             case 'destroyAll':
                 return progress.remainingEnemies === 0;
             case 'escort':
-                return progress.turnsTaken <= this.turnsAllowed && progress.reachedExit === true;
+                return progress.turnsTaken <= this.turnsAllowed;
             case 'collect':
                 return (progress.coinsCollected || 0) >= this.coinsRequired;
             default:

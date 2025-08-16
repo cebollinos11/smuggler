@@ -1,5 +1,5 @@
 import { SoundManager } from '../scripts/SoundManager.js';
-import { GameState } from '../scripts/GameState.js';  
+import { GameState, GameStateC } from '../scripts/GameState.js';  
 import { ShipStatTemplates,createShipStats } from '../scripts/Stats.js';
 export class BootScene extends Phaser.Scene {
   preload() {
@@ -66,6 +66,11 @@ export class BootScene extends Phaser.Scene {
     // Music
     // this.load.audio('bgm', 'assets/sound/music/flesh.mp3');
     // this.load.audio('bgm_gameplay', 'assets/sound/music/nebulae.mp3');
+    // this.load.audio('bgm', 'assets/sound/music/TERMINATOR.mp3');
+    
+        this.load.audio('bgm', 'assets/sound/music/PabloMenuLoop.mp3');
+
+
 
     // UI
     this.load.audio('click', 'assets/sound/sfx/click.wav');
@@ -82,6 +87,8 @@ export class BootScene extends Phaser.Scene {
     this.load.audio('turn', 'assets/sound/sfx/350863__cabled_mess__blip_c_03.wav');
     this.load.audio('keypress', 'assets/sound/sfx/keypress.mp3');
     this.load.audio('flip_switch', 'assets/sound/sfx/278204__ianstargem__switch-flip-2.wav');
+    this.load.audio('coin_collect', 'assets/sound/sfx/200462__wubitog__tractor-beam-power-generator.wav');
+    this.load.audio('warp', 'assets/sound/sfx/220193__gameaudio__teleport-spacey.wav');
 
     this.load.spritesheet('explosion', 'assets/exp2.jpg', {
       frameWidth: 64,
@@ -122,10 +129,11 @@ export class BootScene extends Phaser.Scene {
   create() {
     this.game.soundManager = new SoundManager(this); // Initialize singleton
     //initialize player ship
+    GameState.reset(); // Reset game state
     GameState.shipData = createShipStats(ShipStatTemplates.standard);
     //this.scene.start('SelectShipScene');
-    this.scene.start('SelectMissionScene');
-    // this.scene.start("SelectLevelScene");
+    // this.scene.start('SelectMissionScene');
+     this.scene.start("SelectLevelScene");
 
   }
 }

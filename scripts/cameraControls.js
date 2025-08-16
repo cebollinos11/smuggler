@@ -27,8 +27,6 @@ export function setupCameraControls(scene) {
             cam.scrollY = scene.cameraStartScroll.y - dragY / cam.zoom;
         }
     });
-
-
 }
 
 export async function resetCameraToShip(scene) {
@@ -50,5 +48,27 @@ export async function resetCameraToShip(scene) {
             cam.startFollow(scene.ship.sprite);
             resolve();
         });
+    });
+}
+
+/**
+ * Smoothly pans the camera to a point between two positions.
+ * @param {Phaser.Scene} scene - The game scene.
+ * @param {number} x1 - X of first object.
+ * @param {number} y1 - Y of first object.
+ * @param {number} x2 - X of second object.
+ * @param {number} y2 - Y of second object.
+ * @param {number} duration - Pan time in ms.
+ */
+export async function panCameraBetweenPoints(scene, x1, y1, x2, y2, duration = 400) {
+    const cam = scene.cameras.main;
+    const midX = (x1 + x2) / 2;
+    const midY = (y1 + y2) / 2;
+
+    cam.stopFollow();
+    cam.pan(midX, midY, duration, 'Sine.easeInOut', true);
+
+    return new Promise((resolve) => {
+        cam.once('camerapancomplete', resolve);
     });
 }

@@ -19,22 +19,16 @@ Hansjörg Malthaner, and link here: http://opengameart.org/users/varkalandar
 # possible assets
 https://opengameart.org/content/shmup-ships
 
+#feedback
+levels too big/empty
+enemies could be faster when far away?
+remove any delays in animations
+
 #todo
-
-make it so the progress is an object with methods
-use methods to increase variables
-bind to the ui controller
-make the report scene use the progress object
-
-make it so the gameplay scene shows the win condition
-make it so the reward scene check for win condition
-- mission completed
-- mission failed
-- you died
- Collect
- Smuggle
- Destroy
-
+make the report scene better
+make the escort mission type more interesting
+test restart runs code
+Mine behaviour
 
 Improve destroyer - maybe it spawns fighters? / tractor beam
 Zoom button
@@ -48,16 +42,3 @@ Max moves system
 end level -> select next level + upgrade ship
 Asteroid piercer
 
-Plan
-Create a structure of Enemies > difficulty
-Improve level generator so it uses enemy tiers
-generate missions
-Roguelike modeedit
-
-Mission Generator:
-params:
-    Difficulty Level
-    Mission type
-        - Destroy X ships of type X
-        - Collect X coins
-        - Deliver package in less than X turns

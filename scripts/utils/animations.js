@@ -43,9 +43,23 @@ export async function createFloatingText(scene,{
     });
 }
 
+// A reusable blink effect for Phaser GameObjects
+export function blink(scene, target, { repeat = 5, duration = 100 } = {}) {
+    scene.tweens.add({
+        targets: target,
+        alpha: 0,
+        yoyo: true,
+        repeat: repeat,
+        duration: duration,
+        onComplete: () => {
+            target.setAlpha(1); // Ensure alpha is reset
+        }
+    });
+}
+
 
 export async function animatePlayerExit(scene, ship, exit) {
-    // Disable collisions
+    scene.game.soundManager.playSFX("warp");
 
     // Bring exit to top (in case it's under something)
 

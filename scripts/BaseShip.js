@@ -5,6 +5,8 @@ import { RENDER_LAYERS } from './utils/rendering.js';
 import { showExplosion, showShieldsGettingHit, createFloatingText, animatePlayerExploding } from './utils/animations.js';
 import { createShipStats, StatType } from './Stats.js';
 import { drawConePreview } from './utils/cone.js';
+import { blink } from './utils/animations.js';
+import { panCameraBetweenPoints, resetCameraToShip } from './cameraControls.js';
 export class BaseShip {
     constructor(scene, sprite, x, y, stats) {
         this.isPlayer = false;
@@ -140,98 +142,100 @@ export class BaseShip {
         this.scene.coneGraphics.clear();
     }
 
-    async fireWeapon(target) {
-        const attackRange = this.stats[StatType.ATTACK_RANGE].current;
-        const attackPower = this.stats[StatType.ATTACK_POWER].current;
+async fireWeapon(target) {
+    const attackRange = this.stats[StatType.ATTACK_RANGE].current;
+    const attackPower = this.stats[StatType.ATTACK_POWER].current;
 
-        const { x: sx, y: sy } = this.sprite;
-        const { x: tx, y: ty } = target;
+    const { x: sx, y: sy } = this.sprite;
+    const { x: tx, y: ty } = target;
 
-        const distanceToTarget = Phaser.Math.Distance.Between(sx, sy, tx, ty);
-        const laserLine = new Phaser.Geom.Line(sx, sy, tx, ty);
+    
+    
+    const distanceToTarget = Phaser.Math.Distance.Between(sx, sy, tx, ty);
+    const laserLine = new Phaser.Geom.Line(sx, sy, tx, ty);
 
-        const asteroidsInLine = this.scene.asteroids.getChildren()
-            .map(asteroid => {
-                const body = asteroid.body;
-                if (!body) return null;
+    const asteroidsInLine = this.scene.asteroids.getChildren()
+    .map(asteroid => {
+            const body = asteroid.body;
+            if (!body) return null;
+            
+            const radius = body.width / 2;
+            const cx = body.x + radius;
+            const cy = body.y + radius;
+            const circle = new Phaser.Geom.Circle(cx, cy, radius);
+            
+            const points = Phaser.Geom.Intersects.GetLineToCircle(laserLine, circle);
+            if (points?.length > 0) {
+                return {
+                    asteroid,
+                    intersection: points[0],
+                    distance: Phaser.Math.Distance.Between(sx, sy, points[0].x, points[0].y)
+                };
+            }
+            return null;
+        })
+        .filter(Boolean);
+        
+    // 🎯 NEW — Pan camera between shooter and target
+    let hitChance = 0;
+    const third = attackRange / 3;
+    if (distanceToTarget <= third) {
+        hitChance = 0.95;
+    } else if (distanceToTarget <= 2 * third) {
+        const ratio = (distanceToTarget - third) / third;
+        hitChance = 0.95 - ratio * (0.95 - 0.70);
+    } else {
+        const maxDistance = attackRange;
+        const remaining = Math.min(distanceToTarget - 2 * third, maxDistance - 2 * third);
+        const ratio = remaining / (maxDistance - 2 * third);
+        hitChance = 0.70 - ratio * (0.70 - 0.30);
+    }
 
-                const radius = body.width / 2;
-                const cx = body.x + radius;
-                const cy = body.y + radius;
-                const circle = new Phaser.Geom.Circle(cx, cy, radius);
+    if (this.accurateEnabled) hitChance = 1.0;
 
-                const points = Phaser.Geom.Intersects.GetLineToCircle(laserLine, circle);
-                if (points?.length > 0) {
-                    return {
-                        asteroid,
-                        intersection: points[0],
-                        distance: Phaser.Math.Distance.Between(sx, sy, points[0].x, points[0].y)
-                    };
-                }
-                return null;
-            })
-            .filter(Boolean);
-
-        let hitChance = 0;
-        const third = attackRange / 3;
-        if (distanceToTarget <= third) {
-            hitChance = 0.95;
-        } else if (distanceToTarget <= 2 * third) {
-            const ratio = (distanceToTarget - third) / third;
-            hitChance = 0.95 - ratio * (0.95 - 0.70);
-        } else {
-            const maxDistance = attackRange;
-            const remaining = Math.min(distanceToTarget - 2 * third, maxDistance - 2 * third);
-            const ratio = remaining / (maxDistance - 2 * third);
-            hitChance = 0.70 - ratio * (0.70 - 0.30);
-        }
-
-        if (this.accurateEnabled) hitChance = 1.0;
-
-        if (this.hasCollidedWithAsteroidThisTurn) {
-            hitChance /= 4;
-            createFloatingText(this.scene, {
-                text: "Asteroid",
-                color: "#ffffff",
-                x: this.sprite.x,
-                y: this.sprite.y - 32,
-                fontSize: "20px"
-            });
-        }
-
+    if (this.hasCollidedWithAsteroidThisTurn) {
+        hitChance /= 4;
         createFloatingText(this.scene, {
-            text: Math.round(hitChance * 100) + "%",
+            text: "Asteroid",
             color: "#ffffff",
-            x: target.x,
-            y: target.y - 32,
+            x: this.sprite.x,
+            y: this.sprite.y - 32,
             fontSize: "20px"
         });
+    }
 
-        if (asteroidsInLine.length === 0) {
-            this.scene.game.soundManager.playSFX("aim");
-            await animateShipAiming(this.scene, this.sprite, target);
-        } else {
-            return;
-        }
+    createFloatingText(this.scene, {
+        text: Math.round(hitChance * 100) + "%",
+        color: "#ffffff",
+        x: target.x,
+        y: target.y - 32,
+        fontSize: "20px"
+    });
 
-        const hitRoll = Math.random();
-        const isHit = hitRoll <= hitChance;
+    if (asteroidsInLine.length === 0) {
+        this.scene.game.soundManager.playSFX("aim");
+        await panCameraBetweenPoints(this.scene, sx, sy, tx, ty);
+        await animateShipAiming(this.scene, this.sprite, target);
+    } else {
+        return;
+    }
 
-        if (!isHit) {
-            this.scene.game.soundManager.playSFX("click");
-            createFloatingText(this.scene, {
-                text: "Miss",
-                x: target.x,
-                y: target.y - 50,
-                color: "#73ff00ff",
-                floatDistance: 0,
-                scale: 1,
-                duration: 1200
-            });
-            await animateShipShooting(this.scene, this.sprite, target, { flashCount: 3, laserDuration: 300 });
-            return;
-        }
+    const hitRoll = Math.random();
+    const isHit = hitRoll <= hitChance;
 
+    if (!isHit) {
+        this.scene.game.soundManager.playSFX("click");
+        createFloatingText(this.scene, {
+            text: "Miss",
+            x: target.x,
+            y: target.y - 50,
+            color: "#73ff00ff",
+            floatDistance: 0,
+            scale: 1,
+            duration: 1200
+        });
+        await animateShipShooting(this.scene, this.sprite, target, { flashCount: 3, laserDuration: 300 });
+    } else {
         await animateShipShooting(this.scene, this.sprite, target, { flashCount: 3, laserDuration: 300 });
         this.scene.game.soundManager.playSFX("hit_ship");
 
@@ -243,6 +247,11 @@ export class BaseShip {
 
         await target.getData('controller').takeDamage(damageToInflict);
     }
+
+    // 🎯 Return camera to player ship after shooting
+    //await resetCameraToShip(this.scene);
+}
+
 
     async takeDamage(amount) {
         let shieldDamage = 0;
@@ -257,6 +266,9 @@ export class BaseShip {
             amount -= shieldDamage;
             showShieldsGettingHit(this.scene, this.sprite.x, this.sprite.y);
             this.scene.game.soundManager.playSFX("shield_hit");
+            if(amount<1) {
+                flashSprite(this.scene, this.sprite, 1, 100, 0x00ff00); // Flash green for shield hit
+            }
         }
 
         if (amount > 0) {
@@ -264,6 +276,8 @@ export class BaseShip {
             hull.current -= hullDamage;
             showExplosion(this.scene, this.sprite.x, this.sprite.y);
             this.scene.game.soundManager.playSFX("hull_hit");
+            //play blink animation
+            blink(this.scene, this.sprite);
         }
 
         this.showFloatingDamageText(shieldDamage, hullDamage);
@@ -272,14 +286,24 @@ export class BaseShip {
             this.scene.game.soundManager.playSFX("ship_destroyed");
             await this.destroy();
         }
+        else {
+            
+        }
     }
 
-    async destroy() {
-        this.clearTrail();
-        await animatePlayerExploding(this.scene, this);
-        this.scene.enemies.remove(this.sprite, true);
-        this.sprite.destroy();
-    }
+async destroy() {
+    this.clearTrail();
+
+    // Hook for subclasses
+    this.onDestroyed();
+
+    await animatePlayerExploding(this.scene, this);
+    this.scene.enemies.remove(this.sprite, true);
+    this.sprite.destroy();
+}
+
+// Default no-op
+onDestroyed() {}
 
     showFloatingDamageText(shieldDamage, hullDamage) {
         const offset = this.sprite.displayHeight / 2;

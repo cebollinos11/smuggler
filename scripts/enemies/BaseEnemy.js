@@ -1,6 +1,7 @@
 // BaseEnemy.js
 import { BaseShip } from '../BaseShip.js';
 import { RENDER_LAYERS } from '../utils/rendering.js';
+import { GameState } from '../GameState.js';
 
 export class BaseEnemy extends BaseShip {
     constructor(scene, sprite, x, y, config) {
@@ -31,7 +32,11 @@ export class BaseEnemy extends BaseShip {
         }
     }
 
+onDestroyed() {
+    console.log("Enemy destroyed! Awarding points...");
+    GameState.run.currentMission.progress.addDestroyed(this.stats.editorName);
 
+}
 
 
 

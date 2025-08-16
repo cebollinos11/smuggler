@@ -49,7 +49,13 @@ export function UIOnNewTurn(zapped = false) {
     sceneRef.isUTurnEnabled = false;
     updateOverheatPreview();
     setUIEnabled(true);
+    UpdateMission();
+}
+
+export function UpdateMission()
+{
     updateMissionRewardUI(GameState.run.currentMission,GameState.run.currentMission.progress);
+
 }
 
 

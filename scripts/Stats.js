@@ -31,8 +31,9 @@ export const EnemyShipTemplates ={
       [StatType.HULL]: 10,
       [StatType.ATTACK_POWER]: 30,
       [StatType.ATTACK_RANGE]: 1100,
-      [StatType.ATTACK_ANGLE]: 360,
+      [StatType.ATTACK_ANGLE]: 90,
       [StatType.MAXSPEED]: 0,
+      isTurret: true,
     },
     probe: {
       editorName: "probe",
@@ -123,6 +124,8 @@ export const EnemyShipTemplates ={
     [StatType.ATTACK_RANGE]: 1000,
     [StatType.ATTACK_ANGLE]: 100,
     [StatType.MAXSPEED]: 0,
+    isTurret: true,
+
   },
 
   advanced_viper: {

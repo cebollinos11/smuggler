@@ -1,5 +1,6 @@
 import { generateLevel } from '../scripts/utils/levelgenerator.js'; // Import the level generator
 import {proceduralLevels} from "../config/LevelGenerationConfig.js"
+import { GameState } from '../scripts/GameState.js';
 
 export default class SelectLevelScene extends Phaser.Scene {
   constructor() {
@@ -92,6 +93,20 @@ this.createHtmlButton({
     ui.style.display = 'none';
     this.scene.start('UpgradeScene', {
       previousScene: 'SelectLevelScene', // store where we came from
+    });
+  }
+});
+
+        // Inside create() in SelectLevelScene, after other buttons:
+this.createHtmlButton({
+  title: "Start Roguelike Mode",
+  createdby: "-",
+  difficulty: "-",
+  onClick: () => {
+    GameState.reset(); // Reset game state
+    ui.style.display = 'none';
+    this.scene.start('SelectShipScene', {
+      previousScene: 'SelectMissionScene', // store where we came from
     });
   }
 });
